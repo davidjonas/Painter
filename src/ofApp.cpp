@@ -63,6 +63,9 @@ void ofApp::setup(){
 	std::string address = "http://localhost:8080";
 	socketIO.setup(address);
 	ofAddListener(socketIO.connectionEvent, this, &ofApp::onConnection);
+
+  //post processing initialization
+  //setupPost();
 }
 
 void ofApp::setupPost()

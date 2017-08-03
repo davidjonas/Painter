@@ -1,6 +1,6 @@
 ofxJSON
 ofxKinect
 ofxOpenCv
-ofxPostProcessing
+ofxPostProcessing_tekt
 ofxSocketIO
 ofxTiming

@@ -6,6 +6,9 @@ void ofApp::setup(){
 
 	//ofHideCursor();
 
+  //post processing initialization
+  setupPost();
+
   //Kinect initialization
   ofxKinect kinectCounter;
   kinects = kinectCounter.numTotalDevices();
@@ -64,22 +67,20 @@ void ofApp::setup(){
 	socketIO.setup(address);
 	ofAddListener(socketIO.connectionEvent, this, &ofApp::onConnection);
 
-  //post processing initialization
-  //setupPost();
 }
 
 void ofApp::setupPost()
 {
-  post.init(ofGetWidth(), ofGetHeight());
-  post.createPass<FxaaPass>()->setEnabled(false);
-  post.createPass<BloomPass>()->setEnabled(false);
-  post.createPass<DofPass>()->setEnabled(false);
+  post.init(ofGetWindowWidth(), ofGetWindowHeight());
+  //post.createPass<FxaaPass>()->setEnabled(false);
+  //post.createPass<BloomPass>()->setEnabled(false);
+  //post.createPass<DofPass>()->setEnabled(false);
   post.createPass<KaleidoscopePass>()->setEnabled(false);
-  post.createPass<NoiseWarpPass>()->setEnabled(false);
-  post.createPass<PixelatePass>()->setEnabled(false);
-  post.createPass<EdgePass>()->setEnabled(false);
-  post.createPass<VerticalTiltShifPass>()->setEnabled(false);
-  post.createPass<GodRaysPass>()->setEnabled(false);
+  //post.createPass<NoiseWarpPass>()->setEnabled(false);
+  //post.createPass<PixelatePass>()->setEnabled(false);
+  //post.createPass<EdgePass>()->setEnabled(false);
+  //post.createPass<VerticalTiltShifPass>()->setEnabled(false);
+  //post.createPass<GodRaysPass>()->setEnabled(false);
 }
 
 //SocketIO stuff
@@ -161,12 +162,12 @@ void ofApp::draw(){
   ofBackground(0);
   ofSetColor(255, 255, 255);
 
-  //post.begin(cam);
-  cam.begin();
+  post.begin(cam);
+  //cam.begin();
     drawClouds();
     drawSentences();
-  cam.end();
-  //post.end();
+  //cam.end();
+  post.end();
 
   if(calibration)
   {

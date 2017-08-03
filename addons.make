@@ -1,0 +1,6 @@
+ofxJSON
+ofxKinect
+ofxOpenCv
+ofxPostProcessing
+ofxSocketIO
+ofxTiming

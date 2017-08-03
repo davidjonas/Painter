@@ -20,6 +20,7 @@ void ofApp::setup(){
   }
 
   //Camera initialization
+  depthOfField.setup(ofGetWindowWidth(), ofGetWindowHeight());
   initialCameraPosition.x = 0.0;
   initialCameraPosition.y = 0.0;
   initialCameraPosition.z = 1800;
@@ -144,10 +145,13 @@ void ofApp::draw(){
   ofBackground(0);
   ofSetColor(255, 255, 255);
 
-  cam.begin();
+  depthOfField.begin();
+  cam.begin(depthOfField.getDimensions());
     drawClouds();
     drawSentences();
   cam.end();
+  depthOfField.end();
+  depthOfField.getFbo().draw(0, 0);
 
   if(calibration)
   {
@@ -218,6 +222,9 @@ void ofApp::handleCamera()
 	if(right) cam.truck(50);
   if(fly) cam.boom(50);
   if(land) cam.boom(-50);
+
+  depthOfField.setFocalDistance(400);
+  depthOfField.setFocalRange(200);
 }
 
 void ofApp::resetCamera()

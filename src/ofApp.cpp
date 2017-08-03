@@ -20,7 +20,6 @@ void ofApp::setup(){
   }
 
   //Camera initialization
-  depthOfField.setup(ofGetWidth(), ofGetHeight()); //TODO:This might not adapt to changing resolutions runtime. Test it
   initialCameraPosition.x = 0.0;
   initialCameraPosition.y = 0.0;
   initialCameraPosition.z = 1800;
@@ -64,20 +63,6 @@ void ofApp::setup(){
 	std::string address = "http://localhost:8080";
 	socketIO.setup(address);
 	ofAddListener(socketIO.connectionEvent, this, &ofApp::onConnection);
-}
-
-void ofApp::setupPost()
-{
-  post.init(ofGetWidth(), ofGetHeight());
-  post.createPass<FxaaPass>()->setEnabled(false);
-  post.createPass<BloomPass>()->setEnabled(false);
-  post.createPass<DofPass>()->setEnabled(false);
-  post.createPass<KaleidoscopePass>()->setEnabled(false);
-  post.createPass<NoiseWarpPass>()->setEnabled(false);
-  post.createPass<PixelatePass>()->setEnabled(false);
-  post.createPass<EdgePass>()->setEnabled(false);
-  post.createPass<VerticalTiltShifPass>()->setEnabled(false);
-  post.createPass<GodRaysPass>()->setEnabled(false);
 }
 
 //SocketIO stuff
@@ -146,8 +131,6 @@ void ofApp::update(){
   {
     orbitSpeed += (targetOrbitSpeed - orbitSpeed) * 0.01;
   }
-  depthOfField.setFocalRange(200);
-  depthOfField.setFocalDistance(400);
 
   handleCamera();
   for(int i=0; i<kinects; i++)
@@ -161,15 +144,10 @@ void ofApp::draw(){
   ofBackground(0);
   ofSetColor(255, 255, 255);
 
-  //post.begin(cam);
-  depthOfField.begin();
-  cam.begin(depthOfField.getDimensions());
+  cam.begin();
     drawClouds();
     drawSentences();
   cam.end();
-  depthOfField.end();
-  depthOfField.getFbo().draw(0, 0);
-  //post.end();
 
   if(calibration)
   {

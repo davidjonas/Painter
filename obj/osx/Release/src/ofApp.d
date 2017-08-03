@@ -625,31 +625,6 @@ obj/osx/Release/src/ofApp.o: \
   /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxSocketIO/libs/socket.io-client/include/sio_message.h \
   /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxSocketIO/libs/socket.io-client/include/sio_socket.h \
   /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxSocketIO/src/ofxSocketIOData.h \
-  /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/ofxPostProcessing.h \
-  /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/BloomPass.h \
-  /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/RenderPass.h \
-  /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/ConvolutionPass.h \
-  /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/DofPass.h \
-  /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/DofAltPass.h \
-  /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/EdgePass.h \
-  /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/FxaaPass.h \
-  /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/KaleidoscopePass.h \
-  /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/NoiseWarpPass.h \
-  /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/PixelatePass.h \
-  /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/PostProcessing.h \
-  /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/LUTPass.h \
-  /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/ContrastPass.h \
-  /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/SSAOPass.h \
-  /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/HorizontalTiltShifPass.h \
-  /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/VerticalTiltShifPass.h \
-  /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/RGBShiftPass.h \
-  /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/FakeSSSPass.h \
-  /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/ZoomBlurPass.h \
-  /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/BleachBypassPass.h \
-  /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/ToonPass.h \
-  /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/GodRaysPass.h \
-  /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/RimHighlightingPass.h \
-  /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/LimbDarkeningPass.h \
   /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxTiming/src/ofxTiming.h \
   /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxTiming/src/DelayTimer.h \
   /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxTiming/src/FadeTimer.h \
@@ -1906,56 +1881,6 @@ obj/osx/Release/src/ofApp.o: \
 /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxSocketIO/libs/socket.io-client/include/sio_socket.h:
 
 /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxSocketIO/src/ofxSocketIOData.h:
-
-/Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/ofxPostProcessing.h:
-
-/Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/BloomPass.h:
-
-/Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/RenderPass.h:
-
-/Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/ConvolutionPass.h:
-
-/Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/DofPass.h:
-
-/Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/DofAltPass.h:
-
-/Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/EdgePass.h:
-
-/Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/FxaaPass.h:
-
-/Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/KaleidoscopePass.h:
-
-/Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/NoiseWarpPass.h:
-
-/Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/PixelatePass.h:
-
-/Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/PostProcessing.h:
-
-/Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/LUTPass.h:
-
-/Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/ContrastPass.h:
-
-/Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/SSAOPass.h:
-
-/Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/HorizontalTiltShifPass.h:
-
-/Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/VerticalTiltShifPass.h:
-
-/Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/RGBShiftPass.h:
-
-/Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/FakeSSSPass.h:
-
-/Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/ZoomBlurPass.h:
-
-/Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/BleachBypassPass.h:
-
-/Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/ToonPass.h:
-
-/Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/GodRaysPass.h:
-
-/Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/RimHighlightingPass.h:
-
-/Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxPostProcessing/src/LimbDarkeningPass.h:
 
 /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxTiming/src/ofxTiming.h:
 

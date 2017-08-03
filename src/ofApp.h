@@ -6,7 +6,6 @@
 #include "ofEvents.h"
 #include "ofxSocketIO.h"
 #include "ofxSocketIOData.h"
-#include "ofxPostProcessing.h"
 #include "ofxTiming.h"
 
 class ofApp : public ofBaseApp{
@@ -68,7 +67,6 @@ class ofApp : public ofBaseApp{
 		float targetOrbitSpeed;
 		ofVec3f orbitCenterPoint;
 		ofVec3f initialCameraPosition;
-		ofxPostProcessing post;
 
     //SocketIO stuff
   	void onSpeechEvent(ofxSocketIOData& data);

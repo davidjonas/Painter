@@ -1,3 +1,4 @@
+ofxDOF
 ofxJSON
 ofxKinect
 ofxOpenCv

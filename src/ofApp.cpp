@@ -20,6 +20,7 @@ void ofApp::setup(){
   }
 
   //Camera initialization
+  depthOfField.setup(ofGetWidth(), ofGetHeight()); //TODO:This might not adapt to changing resolutions runtime. Test it
   initialCameraPosition.x = 0.0;
   initialCameraPosition.y = 0.0;
   initialCameraPosition.z = 1800;
@@ -145,6 +146,8 @@ void ofApp::update(){
   {
     orbitSpeed += (targetOrbitSpeed - orbitSpeed) * 0.01;
   }
+  depthOfField.setFocalRange(200);
+  depthOfField.setFocalDistance(400);
 
   handleCamera();
   for(int i=0; i<kinects; i++)
@@ -159,10 +162,13 @@ void ofApp::draw(){
   ofSetColor(255, 255, 255);
 
   //post.begin(cam);
-  cam.begin();
+  depthOfField.begin();
+  cam.begin(depthOfField.getDimensions());
     drawClouds();
     drawSentences();
   cam.end();
+  depthOfField.end();
+  depthOfField.getFbo().draw(0, 0);
   //post.end();
 
   if(calibration)

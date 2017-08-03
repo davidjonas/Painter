@@ -8,6 +8,7 @@
 #include "ofxSocketIOData.h"
 #include "ofxPostProcessing.h"
 #include "ofxTiming.h"
+#include "ofxDOF.h"
 
 class ofApp : public ofBaseApp{
 
@@ -46,6 +47,7 @@ class ofApp : public ofBaseApp{
 		int selectedCloud;
 
 		ofCamera cam;
+		ofxDOF depthOfField;
 		float fov;
 		bool up;
 		bool down;

@@ -655,7 +655,8 @@ obj/osx/Release/src/ofApp.o: \
   /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxTiming/src/FadeTimer.h \
   /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxTiming/src/Hysteresis.h \
   /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxTiming/src/RateTimer.h \
-  /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxTiming/src/LerpTimer.h
+  /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxTiming/src/LerpTimer.h \
+  /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxDOF/src/ofxDOF.h
 
 /Users/davidjonas/Documents/Freelance/OpenFrameworks/apps/myApps/Painter/src/ofApp.h:
 
@@ -1968,3 +1969,5 @@ obj/osx/Release/src/ofApp.o: \
 /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxTiming/src/RateTimer.h:
 
 /Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxTiming/src/LerpTimer.h:
+
+/Users/davidjonas/Documents/Freelance/OpenFrameworks/addons/ofxDOF/src/ofxDOF.h:

@@ -72,15 +72,15 @@ void ofApp::setup(){
 void ofApp::setupPost()
 {
   post.init(ofGetWindowWidth(), ofGetWindowHeight());
-  //post.createPass<FxaaPass>()->setEnabled(false);
-  //post.createPass<BloomPass>()->setEnabled(false);
-  //post.createPass<DofPass>()->setEnabled(false);
+  post.createPass<FxaaPass>()->setEnabled(false);
+  post.createPass<BloomPass>()->setEnabled(false);
+  post.createPass<DofAltPass>()->setEnabled(false);
   post.createPass<KaleidoscopePass>()->setEnabled(false);
-  //post.createPass<NoiseWarpPass>()->setEnabled(false);
-  //post.createPass<PixelatePass>()->setEnabled(false);
-  //post.createPass<EdgePass>()->setEnabled(false);
-  //post.createPass<VerticalTiltShifPass>()->setEnabled(false);
-  //post.createPass<GodRaysPass>()->setEnabled(false);
+  post.createPass<NoiseWarpPass>()->setEnabled(false);
+  post.createPass<PixelatePass>()->setEnabled(false);
+  post.createPass<EdgePass>()->setEnabled(false);
+  post.createPass<VerticalTiltShifPass>()->setEnabled(false);
+  post.createPass<GodRaysPass>()->setEnabled(false);
 }
 
 //SocketIO stuff

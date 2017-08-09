@@ -44,7 +44,7 @@ void ofApp::setup(){
   camOrbit = false;
 	orbitLatitude = 0;
   orbitLongitude = 0;
-  orbitRadius = 1800;
+  orbitRadius = 5800;
   orbitSpeed = 0.1;
   targetOrbitSpeed = 0.1;
   orbitCenterPoint.x = 0;
@@ -73,10 +73,15 @@ void ofApp::setupPost()
 {
   post.init(ofGetWindowWidth(), ofGetWindowHeight());
   post.createPass<FxaaPass>()->setEnabled(false);
-  post.createPass<BloomPass>()->setEnabled(false);
-  post.createPass<DofAltPass>()->setEnabled(false);
+  post.createPass<BloomPass>()->setEnabled(true);
+  DofPass::Ptr dof = post.createPass<DofPass>();
+  dof->setEnabled(true);
+  dof->setAperture(0.6);
+  dof->setFocus(0.995);
   post.createPass<KaleidoscopePass>()->setEnabled(false);
   post.createPass<NoiseWarpPass>()->setEnabled(false);
+  post.createPass<ConvolutionPass>()->setEnabled(false);
+  post.createPass<BleachBypassPass>()->setEnabled(false);
   post.createPass<PixelatePass>()->setEnabled(false);
   post.createPass<EdgePass>()->setEnabled(false);
   post.createPass<VerticalTiltShifPass>()->setEnabled(false);
@@ -276,6 +281,14 @@ void ofApp::drawDebug(){
 
   //Calibration data
   drawCalibration();
+
+  cam.begin();
+  ofPushMatrix();
+  ofEnableDepthTest();
+	ofDrawSphere(orbitCenterPoint.x, orbitCenterPoint.y, orbitCenterPoint.z, 10);
+	ofDisableDepthTest();
+	ofPopMatrix();
+  cam.end();
 }
 
 void ofApp::drawCalibration()

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<Point_Clouds>
+	<Focus>995</Focus>
+	<Aperture>0.6</Aperture>
+	<Center_of_rotation>0, 0, -1800</Center_of_rotation>
+	<Radius>5800</Radius>
+	<Orbit_speed>0.1, 0</Orbit_speed>
+	<color>100, 100, 100, 255</color>
+	<RGB_Image>1</RGB_Image>
+</Point_Clouds>

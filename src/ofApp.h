@@ -8,12 +8,15 @@
 #include "ofxSocketIOData.h"
 #include "ofxPostProcessing.h"
 #include "ofxTiming.h"
+#include "ofxGui.h"
 
 class ofApp : public ofBaseApp{
 
 	public:
 		void setup();
 		void setupPost();
+		void setupGUI();
+		void GUIUpdate();
 		void update();
 		void draw();
 		void exit();
@@ -63,12 +66,56 @@ class ofApp : public ofBaseApp{
 		bool listening;
 		float orbitLatitude;
 		float orbitLongitude;
-		float orbitRadius;
-		float orbitSpeed;
-		float targetOrbitSpeed;
-		ofVec3f orbitCenterPoint;
+		//float orbitRadius;
+		ofVec2f orbitSpeed;
+		//ofVec2f targetOrbitSpeed;
+		//ofVec3f orbitCenterPoint;
 		ofVec3f initialCameraPosition;
 		ofxPostProcessing post;
+
+		//post effects
+		DofPass::Ptr dof;
+		FxaaPass::Ptr antiAlias;
+	  BloomPass::Ptr bloom;
+	  KaleidoscopePass::Ptr kaleidoscope;
+	  NoiseWarpPass::Ptr warp;
+	  ConvolutionPass::Ptr convolution;
+	  BleachBypassPass::Ptr bleach;
+	  PixelatePass::Ptr pixelate;
+	  EdgePass::Ptr edge;
+	  VerticalTiltShifPass::Ptr tiltshift;
+	  GodRaysPass::Ptr godrays;
+		ContrastPass::Ptr contrast;
+
+		//Main GUI
+		ofxPanel gui;
+		ofxFloatSlider focus;
+		ofxFloatSlider aperture;
+		ofxFloatSlider contrastValue;
+		ofxFloatSlider brightnessValue;
+		ofxFloatSlider multipleValue;
+		ofxVec3Slider orbitCenterPoint;
+		ofxFloatSlider orbitRadius;
+		ofxVec2Slider targetOrbitSpeed;
+		ofxColorSlider color;
+		ofxToggle rgbImage;
+		bool guiActive;
+
+		//Effects GUI
+		ofxPanel postGui;
+		ofxToggle dofOn;
+		ofxToggle antiAliasOn;
+		ofxToggle bloomOn;
+	  ofxToggle kaleidoscopeOn;
+	  ofxToggle warpOn;
+	  ofxToggle convolutionOn;
+	  ofxToggle bleachOn;
+	  ofxToggle pixelateOn;
+	  ofxToggle edgeOn;
+	  ofxToggle tiltshiftOn;
+	  ofxToggle godraysOn;
+		ofxToggle contrastOn;
+		bool postGuiActive;
 
     //SocketIO stuff
   	void onSpeechEvent(ofxSocketIOData& data);

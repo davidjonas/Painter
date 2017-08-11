@@ -168,7 +168,7 @@ void PointCloud::draw()
   	for(int x = 0; x < width; x += sparcity) {
   		if(kinect->getDistanceAt(x, y) > 0) {
   			ofColor c = kinect->getColorAt(x,y);
-				c.setBrightness(c.getBrightness() + 30);
+				//c.setBrightness(c.getBrightness() + 30);
   			mesh.addColor(c);
   			mesh.addVertex(kinect->getWorldCoordinateAt(x, y));
   		}
@@ -199,7 +199,7 @@ void PointCloud::draw(ofColor c)
   	for(int x = 0; x < width; x += sparcity) {
   		if(kinect->getDistanceAt(x, y) > 0) {
   			mesh.addColor(c);
-        c.setBrightness(c.getBrightness() + 30);
+        //c.setBrightness(c.getBrightness() + 30);
   			mesh.addVertex(kinect->getWorldCoordinateAt(x, y));
   		}
   	}

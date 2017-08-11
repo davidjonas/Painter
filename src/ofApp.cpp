@@ -8,6 +8,7 @@ void ofApp::setup(){
 
   //post processing initialization
   setupPost();
+  setupGUI();
 
   //Kinect initialization
   ofxKinect kinectCounter;
@@ -45,11 +46,8 @@ void ofApp::setup(){
 	orbitLatitude = 0;
   orbitLongitude = 0;
   orbitRadius = 5800;
-  orbitSpeed = 0.1;
-  targetOrbitSpeed = 0.1;
-  orbitCenterPoint.x = 0;
-  orbitCenterPoint.y= 0;
-  orbitCenterPoint.z = -1800;
+  orbitSpeed.x = 0.1;
+  //targetOrbitSpeed = 0.1;
 
 
   synonyms = false;
@@ -69,23 +67,79 @@ void ofApp::setup(){
 
 }
 
+void ofApp::setupGUI()
+{
+  gui.setup("Point Clouds", "pointcloudSettings.xml", 10, 260);
+  gui.add(focus.setup("Focus", 995, 988, 1000));
+  gui.add(aperture.setup("Aperture", 0.6, 0.1, 20));
+  gui.add(contrastValue.setup("Contrast Value", 1, 0.0, 2));
+  gui.add(brightnessValue.setup("Brightness Value", 2, 0.0, 10));
+  gui.add(multipleValue.setup("Multiple Value", 1, 0.0, 10));
+  gui.add(orbitCenterPoint.setup("Center of rotation", ofVec3f(0,0,-1800), ofVec3f(-2000, -2000, -2000), ofVec3f(3000, 3000, 3000)));
+  gui.add(orbitRadius.setup("Radius", 5800, 10, 10000));
+  gui.add(targetOrbitSpeed.setup("Orbit speed", ofVec2f(0.1,0.0), ofVec2f(-1.0,-1.0), ofVec2f(1.0,1.0)));
+  gui.add(color.setup("color", ofColor(100, 100, 100), ofColor(0, 0), ofColor(255, 255)));
+  gui.add(rgbImage.setup("RGB Image", true));
+  guiActive = true;
+
+  postGui.setup("Effects", "effectsSettings.xml", 10, 10);
+  postGui.add(dofOn.setup("Depth of field", dof->getEnabled()));
+  postGui.add(antiAliasOn.setup("Anti-alias", antiAlias->getEnabled()));
+  postGui.add(bloomOn.setup("Bloom", bloom->getEnabled()));
+  postGui.add(kaleidoscopeOn.setup("Kaleidoscope", kaleidoscope->getEnabled()));
+  postGui.add(warpOn.setup("Noise Warp", warp->getEnabled()));
+  postGui.add(convolutionOn.setup("Convolution", convolution->getEnabled()));
+  postGui.add(bleachOn.setup("Bleach", bleach->getEnabled()));
+  postGui.add(pixelateOn.setup("Pixelate", pixelate->getEnabled()));
+  postGui.add(edgeOn.setup("Edge", edge->getEnabled()));
+  postGui.add(tiltshiftOn.setup("Tilt Shift", tiltshift->getEnabled()));
+  postGui.add(godraysOn.setup("God rays", godrays->getEnabled()));
+  postGui.add(contrastOn.setup("Contrast", contrast->getEnabled()));
+  postGuiActive = true;
+}
+
 void ofApp::setupPost()
 {
   post.init(ofGetWindowWidth(), ofGetWindowHeight());
-  post.createPass<FxaaPass>()->setEnabled(false);
-  post.createPass<BloomPass>()->setEnabled(true);
-  DofPass::Ptr dof = post.createPass<DofPass>();
+
+  dof = post.createPass<DofPass>();
   dof->setEnabled(true);
   dof->setAperture(0.6);
   dof->setFocus(0.995);
-  post.createPass<KaleidoscopePass>()->setEnabled(false);
-  post.createPass<NoiseWarpPass>()->setEnabled(false);
-  post.createPass<ConvolutionPass>()->setEnabled(false);
-  post.createPass<BleachBypassPass>()->setEnabled(false);
-  post.createPass<PixelatePass>()->setEnabled(false);
-  post.createPass<EdgePass>()->setEnabled(false);
-  post.createPass<VerticalTiltShifPass>()->setEnabled(false);
-  post.createPass<GodRaysPass>()->setEnabled(false);
+
+  antiAlias = post.createPass<FxaaPass>();
+  antiAlias->setEnabled(false);
+
+  bloom = post.createPass<BloomPass>();
+  bloom->setEnabled(false);
+
+  kaleidoscope = post.createPass<KaleidoscopePass>();
+  kaleidoscope->setEnabled(false);
+
+  warp = post.createPass<NoiseWarpPass>();
+  warp->setEnabled(false);
+
+  convolution = post.createPass<ConvolutionPass>();
+  convolution->setEnabled(false);
+
+  bleach = post.createPass<BleachBypassPass>();
+  bleach->setEnabled(false);
+
+  pixelate = post.createPass<PixelatePass>();
+  pixelate->setEnabled(false);
+
+  edge = post.createPass<EdgePass>();
+  edge->setEnabled(false);
+
+  tiltshift = post.createPass<VerticalTiltShifPass>();
+  tiltshift->setEnabled(false);
+
+  godrays = post.createPass<GodRaysPass>();
+  godrays->setEnabled(false);
+
+  contrast = post.createPass<ContrastPass>();
+  contrast->setEnabled(false);
+
 }
 
 //SocketIO stuff
@@ -150,16 +204,44 @@ void ofApp::update(){
       handleTimers();
   }
 
-  if(targetOrbitSpeed - orbitSpeed > 0.1 || targetOrbitSpeed - orbitSpeed < -0.1)
+  if(targetOrbitSpeed->x - orbitSpeed.x > 0.1 || targetOrbitSpeed->x - orbitSpeed.x < -0.1)
   {
-    orbitSpeed += (targetOrbitSpeed - orbitSpeed) * 0.01;
+    orbitSpeed.x += (targetOrbitSpeed->x - orbitSpeed.x) * 0.01;
   }
 
+  if(targetOrbitSpeed->y - orbitSpeed.y > 0.1 || targetOrbitSpeed->y - orbitSpeed.y < -0.1)
+  {
+    orbitSpeed.y += (targetOrbitSpeed->y - orbitSpeed.y) * 0.01;
+  }
+
+  GUIUpdate();
   handleCamera();
   for(int i=0; i<kinects; i++)
   {
     clouds[i].update();
   }
+}
+
+void ofApp::GUIUpdate()
+{
+  dof->setFocus(focus/1000);
+  dof->setAperture(aperture);
+
+  contrast->setBrightness(brightnessValue);
+  contrast->setContrast(contrastValue);
+  contrast->setMultiple(multipleValue);
+
+  antiAlias->setEnabled(antiAliasOn);
+  bloom->setEnabled(bloomOn);
+  kaleidoscope->setEnabled(kaleidoscopeOn);
+  warp->setEnabled(warpOn);
+  convolution->setEnabled(convolutionOn);
+  bleach->setEnabled(bleachOn);
+  pixelate->setEnabled(pixelateOn);
+  edge->setEnabled(edgeOn);
+  tiltshift->setEnabled(tiltshiftOn);
+  godrays->setEnabled(godraysOn);
+  contrast->setEnabled(contrastOn);
 }
 
 //--------------------------------------------------------------
@@ -168,7 +250,7 @@ void ofApp::draw(){
   ofSetColor(255, 255, 255);
 
   post.begin(cam);
-  //cam.begin();
+  //cam.begin
     drawClouds();
     drawSentences();
   //cam.end();
@@ -183,13 +265,30 @@ void ofApp::draw(){
   {
     drawDebug();
   }
+
+  if(guiActive)
+  {
+    gui.draw();
+  }
+
+  if(postGuiActive)
+  {
+    postGui.draw();
+  }
 }
 
 void ofApp::drawClouds()
 {
   for(int i=0; i<kinects; i++)
   {
-    clouds[i].draw();
+    if(rgbImage)
+    {
+      clouds[i].draw();
+    }
+    else
+    {
+      clouds[i].draw(color);
+    }
   }
 }
 
@@ -231,7 +330,8 @@ void ofApp::handleCamera()
 	}
 	else
 	{
-		orbitLatitude += orbitSpeed;
+		orbitLatitude += orbitSpeed.x;
+    orbitLongitude += orbitSpeed.y;
 		cam.orbit(orbitLatitude, orbitLongitude, orbitRadius, orbitCenterPoint);
     //cam.setGlobalPosition(cam.getGlobalPosition().x, -1000, cam.getGlobalPosition().z);
 	}
@@ -255,8 +355,10 @@ void ofApp::resetCamera()
   camOrbit = false;
   orbitLatitude = 0;
   orbitRadius = 1800;
-  orbitSpeed = 0.1;
-  targetOrbitSpeed = 0.1;
+  orbitSpeed.x = 0.1;
+  orbitSpeed.y = 0.0;
+  //targetOrbitSpeed->x = 0.1;
+  //targetOrbitSpeed->y = 0.0;
 }
 
 void ofApp::clearSentences()
@@ -285,7 +387,7 @@ void ofApp::drawDebug(){
   cam.begin();
   ofPushMatrix();
   ofEnableDepthTest();
-	ofDrawSphere(orbitCenterPoint.x, orbitCenterPoint.y, orbitCenterPoint.z, 10);
+	ofDrawSphere(orbitCenterPoint->x, orbitCenterPoint->y, orbitCenterPoint->z, 10);
 	ofDisableDepthTest();
 	ofPopMatrix();
   cam.end();
@@ -376,6 +478,10 @@ void ofApp::keyPressed(int key){
       break;
     case ',':
       clearSentences();
+      break;
+    case '\t':
+      guiActive = !guiActive;
+      postGuiActive = !postGuiActive;
       break;
   }
 
@@ -479,11 +585,11 @@ void ofApp::keyPressed(int key){
     {
       case '=':
         //orbitRadius -= 100;
-        targetOrbitSpeed += 0.2;
+        //targetOrbitSpeed->x += 0.2;
         break;
       case '-':
         //orbitRadius += 100;
-        targetOrbitSpeed -= 0.2;
+        //targetOrbitSpeed->x -= 0.2;
         break;
     }
   }

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<Effects>
+	<Depth_of_field>1</Depth_of_field>
+	<Anti-alias>0</Anti-alias>
+	<Bloom>1</Bloom>
+	<Kaleidoscope>0</Kaleidoscope>
+	<Noise_Warp>0</Noise_Warp>
+	<Convolution>0</Convolution>
+	<Bleach>0</Bleach>
+	<Pixelate>0</Pixelate>
+	<Edge>0</Edge>
+	<Tilt_Shift>0</Tilt_Shift>
+	<God_rays>0</God_rays>
+</Effects>

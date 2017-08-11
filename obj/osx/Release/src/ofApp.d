@@ -805,7 +805,18 @@ obj/osx/Release/src/ofApp.o: \
   /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxTiming/src/FadeTimer.h \
   /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxTiming/src/Hysteresis.h \
   /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxTiming/src/RateTimer.h \
-  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxTiming/src/LerpTimer.h
+  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxTiming/src/LerpTimer.h \
+  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxGui.h \
+  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxToggle.h \
+  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxBaseGui.h \
+  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxSlider.h \
+  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxInputField.h \
+  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxSliderGroup.h \
+  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxGuiGroup.h \
+  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxButton.h \
+  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxColorPicker.h \
+  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxPanel.h \
+  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxLabel.h
 
 /Users/davidjonas/Documents/Freelance/openFrameworks/apps/myApps/Painter/src/ofApp.h:
 
@@ -2418,3 +2429,25 @@ obj/osx/Release/src/ofApp.o: \
 /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxTiming/src/RateTimer.h:
 
 /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxTiming/src/LerpTimer.h:
+
+/Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxGui.h:
+
+/Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxToggle.h:
+
+/Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxBaseGui.h:
+
+/Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxSlider.h:
+
+/Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxInputField.h:
+
+/Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxSliderGroup.h:
+
+/Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxGuiGroup.h:
+
+/Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxButton.h:
+
+/Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxColorPicker.h:
+
+/Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxPanel.h:
+
+/Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxLabel.h:

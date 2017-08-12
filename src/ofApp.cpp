@@ -64,7 +64,7 @@ void ofApp::setup(){
 	std::string address = "http://localhost:8080";
 	socketIO.setup(address);
 	ofAddListener(socketIO.connectionEvent, this, &ofApp::onConnection);
-
+  ofAddListener(socketIO.notifyEvent, this, &ofApp::onNotice);
 }
 
 void ofApp::setupGUI()
@@ -147,12 +147,12 @@ void ofApp::onConnection () {
   isConnected = true;
 	ofLogNotice("ofxSocketIO", "Connected!");
   bindEvents();
-	std::string msg = "subscribe";
-  std::string type = "sentence";
-  socketIO.emit(msg, type);
+  subscribeEvents();
+}
 
-  std::string type2 = "speech";
-  socketIO.emit(msg, type2);
+void ofApp::onNotice(string& name)
+{
+  //ofLogNotice("ofxSocketIO NOTICE", name);
 }
 
 void ofApp::bindEvents () {
@@ -163,6 +163,15 @@ void ofApp::bindEvents () {
   std::string sentenceEventName = "sentence";
   socketIO.bindEvent(sentenceEvent, sentenceEventName);
   ofAddListener(sentenceEvent, this, &ofApp::onSentenceEvent);
+}
+
+void ofApp::subscribeEvents() {
+  std::string msg = "subscribe";
+  std::string type = "sentence";
+  socketIO.emit(msg, type);
+
+  std::string type2 = "speech";
+  socketIO.emit(msg, type2);
 }
 
 void ofApp::onSpeechEvent (ofxSocketIOData& data) {
@@ -249,11 +258,11 @@ void ofApp::draw(){
   ofBackground(0);
   ofSetColor(255, 255, 255);
 
-  post.begin(cam);
-  //cam.begin
+  post.begin();
+  cam.begin();
     drawClouds();
     drawSentences();
-  //cam.end();
+  cam.end();
   post.end();
 
   if(calibration)

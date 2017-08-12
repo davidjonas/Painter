@@ -126,11 +126,14 @@ class ofApp : public ofBaseApp{
   	ofxSocketIO socketIO;
   	bool isConnected;
     void onConnection();
+		void onNotice(string& name);
     void bindEvents();
+		void subscribeEvents();
     ofEvent<ofxSocketIOData&> speechEvent;
     ofEvent<ofxSocketIOData&> sentenceEvent;
   	//SocketIO stuff ends here
 
+		//Sentences
 		struct Sentence
 		{
 			string sentence;

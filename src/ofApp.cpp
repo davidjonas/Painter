@@ -65,6 +65,9 @@ void ofApp::setup(){
 	socketIO.setup(address);
 	ofAddListener(socketIO.connectionEvent, this, &ofApp::onConnection);
   ofAddListener(socketIO.notifyEvent, this, &ofApp::onNotice);
+
+  //timer
+  delayTimer.setPeriod(1);
 }
 
 void ofApp::setupGUI()
@@ -156,9 +159,9 @@ void ofApp::onNotice(string& name)
 }
 
 void ofApp::bindEvents () {
-  std::string serverEventName = "speech";
-  socketIO.bindEvent(speechEvent, serverEventName);
-  ofAddListener(speechEvent, this, &ofApp::onSpeechEvent);
+  //std::string serverEventName = "speech";
+  //socketIO.bindEvent(speechEvent, serverEventName);
+  //ofAddListener(speechEvent, this, &ofApp::onSpeechEvent);
 
   std::string sentenceEventName = "sentence";
   socketIO.bindEvent(sentenceEvent, sentenceEventName);
@@ -170,47 +173,61 @@ void ofApp::subscribeEvents() {
   std::string type = "sentence";
   socketIO.emit(msg, type);
 
-  std::string type2 = "speech";
-  socketIO.emit(msg, type2);
+  //std::string type2 = "speech";
+  //socketIO.emit(msg, type2);
 }
 
+//NOTE: Not called anymore, oonly receiving sentence events
 void ofApp::onSpeechEvent (ofxSocketIOData& data) {
   if(listening)
   {
-    Sentence s;
-    s.sentence = data.getStringValue("msg");
+    //Sentence s;
+    //s.sentence = data.getStringValue("msg");
     //s.position = ofVec3f(ofRandom(-1000, 1000), ofRandom(-2000, 2000), ofRandom(-6000, -1000));
-    s.position = ofVec3f(-800, -((int)sentences.size() * 150) + 400, -1000);
-    s.delayTimer.setPeriod(ofRandom(3, 7));
-    sentences.push_back(s);
+    //s.position = ofVec3f(-800, -((int)sentences.size() * 150) + 400, -1000);
+    ////s.delayTimer.setPeriod(ofRandom(3, 7));
+    //sentences.push_back(s);
   }
 }
 
 void ofApp::onSentenceEvent (ofxSocketIOData& data) {
+
+  map<int, Sentence>::iterator it;
+
   int id = data.getIntValue("id");
   string txt = data.getStringValue("changed");
 
-	sentences[id].sentence = txt;
+  it = sentences.find(id);
+  if(it == sentences.end())
+  {
+    Sentence s;
+    s.sentence = txt;
+    s.position = ofVec3f(ofRandom(-1000, 1000), ofRandom(-2000, 2000), ofRandom(-6000, -1000));
+    //s.position = ofVec3f(-800, -((int)sentences.size() * 150) + 400, -1000);
+    sentences[id] = s;
+  }
+  else
+  {
+    sentences[id].sentence = txt;
+  }
 }
 
 void ofApp::handleTimers()
 {
-  for (unsigned i=0; i < sentences.size(); i++)
-  {
-    if(sentences[i].delayTimer.tick())
+    if(delayTimer.tick() && sentences.size()>0)
     {
+      unsigned i = roundf(ofRandom(0, sentences.size()-1));
       string msg = "{\"msg\":\""+ sentences[i].sentence +"\", \"id\":" + to_string(i) + "}";
       string evtName = "process_request";
       socketIO.emit(evtName, msg);
     }
-  }
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
   if(synonyms)
   {
-      handleTimers();
+      //handleTimers();
   }
 
   if(targetOrbitSpeed->x - orbitSpeed.x > 0.1 || targetOrbitSpeed->x - orbitSpeed.x < -0.1)
@@ -240,6 +257,7 @@ void ofApp::GUIUpdate()
   contrast->setContrast(contrastValue);
   contrast->setMultiple(multipleValue);
 
+  dof->setEnabled(dofOn);
   antiAlias->setEnabled(antiAliasOn);
   bloom->setEnabled(bloomOn);
   kaleidoscope->setEnabled(kaleidoscopeOn);

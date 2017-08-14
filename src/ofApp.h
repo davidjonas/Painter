@@ -138,10 +138,12 @@ class ofApp : public ofBaseApp{
 		{
 			string sentence;
 			ofVec3f position;
-			DelayTimer delayTimer;
+			//DelayTimer delayTimer;
 		};
 
-		vector<Sentence> sentences;
+		//vector<Sentence> sentences;
+		map<int, Sentence> sentences;
 		ofTrueTypeFont textFont;
+		DelayTimer delayTimer;
 
 };

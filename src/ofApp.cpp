@@ -2,6 +2,19 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+  ofSetWindowTitle("Alice == Painter");
+
+  //Syphon stuff
+  mainOutputSyphonServer.setName("Screen Output");
+  frame.allocate(2950,800, GL_RGBA);
+  syphonOn = true;
+
+
+  //Midi stuff
+  midiIn.openPort("nanoKONTROL2 SLIDER/KNOB");
+  midiIn.ignoreTypes(false, false, false);
+  midiIn.addListener(this);
+
   textFont.load("Sequel_Demo.ttf", 70);
 
 	//ofHideCursor();
@@ -70,6 +83,99 @@ void ofApp::setup(){
   delayTimer.setPeriod(1);
 }
 
+void ofApp::newMidiMessage(ofxMidiMessage& msg) {
+	if(msg.control == 64 && msg.value == 127)
+  {
+    dofOn = !dofOn;
+  }
+  if(msg.control == 41 && msg.value == 127)
+  {
+    syphonOn = true;
+  }
+  if(msg.control == 42 && msg.value == 127)
+  {
+    syphonOn = false;
+  }
+  if(msg.control == 0)
+  {
+    focus = ofMap(msg.value, 0, 127,  988, 1000);
+  }
+  if(msg.control == 1)
+  {
+    aperture = ofMap(msg.value, 0, 127,  0.1, 20);
+  }
+  if(msg.control == 2)
+  {
+    warp->setAmplitude(ofMap(msg.value, 0, 127,  0, 0.2));
+  }
+  if(msg.control == 45 && msg.value == 127)
+  {
+    rgbImage = !rgbImage;
+  }
+  if(msg.control == 43)
+  {
+    if(msg.value == 127)
+    {
+      convolutionOn = true;
+    }
+    else
+    {
+      convolutionOn = false;
+    }
+  }
+  if(msg.control == 71 && msg.value == 127)
+  {
+    camOrbit = !camOrbit;
+  }
+  if(msg.control == 67 && msg.value == 127)
+  {
+    contrastOn = !contrastOn;
+  }
+  if(msg.control == 66 && msg.value == 127)
+  {
+    warpOn = !warpOn;
+  }
+  if(msg.control == 3)
+  {
+    contrastValue = ofMap(msg.value, 0, 127,  0.0, 2.0);
+  }
+  if(msg.control == 4)
+  {
+    brightnessValue = ofMap(msg.value, 0, 127,  0.0, 10.0);
+  }
+  if(msg.control == 5)
+  {
+    multipleValue = ofMap(msg.value, 0, 127,  0.0, 10.0);
+  }
+  if(msg.control == 55 && msg.value == 127)
+  {
+    targetOrbitSpeed = ofVec2f(0,targetOrbitSpeed->y);
+  }
+  if(msg.control == 54 && msg.value == 127)
+  {
+    targetOrbitSpeed = ofVec2f(targetOrbitSpeed->x, 0);
+  }
+  if(msg.control == 7)
+  {
+    orbitSpeed.x = ofMap(msg.value, 0, 127,  -10, 10);
+    targetOrbitSpeed = orbitSpeed;
+  }
+  if(msg.control == 6)
+  {
+    orbitSpeed.y = ofMap(msg.value, 0, 127,  -10, 10);
+    targetOrbitSpeed = orbitSpeed;
+  }
+  if(msg.control == 16)
+  {
+    fov = ofMap(msg.value, 0, 127,  16, 70);
+    cam.setFov(fov);
+  }
+  if(msg.control == 23)
+  {
+    orbitRadius = ofMap(msg.value, 0, 127,  10.0, 10000.0);
+  }
+}
+
 void ofApp::setupGUI()
 {
   gui.setup("Point Clouds", "pointcloudSettings.xml", 10, 260);
@@ -80,7 +186,7 @@ void ofApp::setupGUI()
   gui.add(multipleValue.setup("Multiple Value", 1, 0.0, 10));
   gui.add(orbitCenterPoint.setup("Center of rotation", ofVec3f(0,0,-1800), ofVec3f(-2000, -2000, -2000), ofVec3f(3000, 3000, 3000)));
   gui.add(orbitRadius.setup("Radius", 5800, 10, 10000));
-  gui.add(targetOrbitSpeed.setup("Orbit speed", ofVec2f(0.1,0.0), ofVec2f(-1.0,-1.0), ofVec2f(1.0,1.0)));
+  gui.add(targetOrbitSpeed.setup("Orbit speed", ofVec2f(0.1,0.0), ofVec2f(-10.0,-10.0), ofVec2f(10.0,10.0)));
   gui.add(color.setup("color", ofColor(100, 100, 100), ofColor(0, 0), ofColor(255, 255)));
   gui.add(rgbImage.setup("RGB Image", true));
   guiActive = true;
@@ -103,7 +209,7 @@ void ofApp::setupGUI()
 
 void ofApp::setupPost()
 {
-  post.init(ofGetWindowWidth(), ofGetWindowHeight());
+  post.init(2950,800);
 
   dof = post.createPass<DofPass>();
   dof->setEnabled(true);
@@ -114,7 +220,7 @@ void ofApp::setupPost()
   antiAlias->setEnabled(false);
 
   bloom = post.createPass<BloomPass>();
-  bloom->setEnabled(false);
+  bloom->setEnabled(true);
 
   kaleidoscope = post.createPass<KaleidoscopePass>();
   kaleidoscope->setEnabled(false);
@@ -276,12 +382,17 @@ void ofApp::draw(){
   ofBackground(0);
   ofSetColor(255, 255, 255);
 
+  if(syphonOn)  frame.begin();
   post.begin();
   cam.begin();
     drawClouds();
     drawSentences();
   cam.end();
   post.end();
+  if(syphonOn)  frame.end();
+
+  if(syphonOn)  mainOutputSyphonServer.publishTexture(&frame.getTexture());
+
 
   if(calibration)
   {
@@ -381,11 +492,11 @@ void ofApp::resetCamera()
   cam.setGlobalPosition(initialCameraPosition.x, initialCameraPosition.y, initialCameraPosition.z);
   camOrbit = false;
   orbitLatitude = 0;
+  orbitLongitude = 0;
   orbitRadius = 1800;
   orbitSpeed.x = 0.1;
   orbitSpeed.y = 0.0;
-  //targetOrbitSpeed->x = 0.1;
-  //targetOrbitSpeed->y = 0.0;
+  targetOrbitSpeed = ofVec2f(0,0);
 }
 
 void ofApp::clearSentences()

@@ -9,8 +9,10 @@
 #include "ofxPostProcessing.h"
 #include "ofxTiming.h"
 #include "ofxGui.h"
+#include "ofxSyphon.h"
+#include "ofxMidi.h"
 
-class ofApp : public ofBaseApp{
+class ofApp : public ofBaseApp, public ofxMidiListener{
 
 	public:
 		void setup();
@@ -146,4 +148,13 @@ class ofApp : public ofBaseApp{
 		ofTrueTypeFont textFont;
 		DelayTimer delayTimer;
 
+		//Syphon stuff
+		ofxSyphonServer mainOutputSyphonServer;
+		ofFbo frame;
+		bool syphonOn;
+
+
+		//Midi stuff
+		ofxMidiIn midiIn;
+		void newMidiMessage(ofxMidiMessage& eventArgs);
 };

@@ -816,7 +816,11 @@ obj/osx/Release/src/main.o: \
   /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxButton.h \
   /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxColorPicker.h \
   /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxPanel.h \
-  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxLabel.h
+  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxLabel.h \
+  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxSyphon/src/ofxSyphon.h \
+  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxSyphon/src/ofxSyphonClient.h \
+  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxSyphon/src/ofxSyphonServer.h \
+  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxSyphon/src/ofxSyphonServerDirectory.h
 
 /Users/davidjonas/Documents/Freelance/openFrameworks/libs/openFrameworks/ofMain.h:
 
@@ -2451,3 +2455,11 @@ obj/osx/Release/src/main.o: \
 /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxPanel.h:
 
 /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxGui/src/ofxLabel.h:
+
+/Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxSyphon/src/ofxSyphon.h:
+
+/Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxSyphon/src/ofxSyphonClient.h:
+
+/Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxSyphon/src/ofxSyphonServer.h:
+
+/Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxSyphon/src/ofxSyphonServerDirectory.h:

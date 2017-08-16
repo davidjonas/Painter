@@ -1,7 +1,9 @@
 ofxGui
 ofxJSON
 ofxKinect
+ofxMidi
 ofxOpenCv
 ofxPostProcessing_tekt
 ofxSocketIO
+ofxSyphon
 ofxTiming

@@ -78,7 +78,7 @@
 # incorporated directly into the final executable application binary.
 # TODO: should this be a default setting?
 # PROJECT_LDFLAGS=-Wl,-rpath=./libs
-PROJECT_LDFLAGS += -framework Syphon
+PROJECT_LDFLAGS += -F$(OF_ROOT)/addons/ofxSyphon/libs/Syphon/lib/osx -framework Syphon
 
 
 ################################################################################

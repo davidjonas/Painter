@@ -820,7 +820,17 @@ obj/osx/Release/src/ofApp.o: \
   /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxSyphon/src/ofxSyphon.h \
   /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxSyphon/src/ofxSyphonClient.h \
   /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxSyphon/src/ofxSyphonServer.h \
-  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxSyphon/src/ofxSyphonServerDirectory.h
+  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxSyphon/src/ofxSyphonServerDirectory.h \
+  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxMidi/src/ofxMidi.h \
+  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxMidi/src/ofxMidiIn.h \
+  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxMidi/src/ofxBaseMidi.h \
+  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxMidi/src/ofxMidiConstants.h \
+  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxMidi/src/ofxMidiMessage.h \
+  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxMidi/src/ofxMidiTypes.h \
+  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxMidi/src/desktop/ofxRtMidiIn.h \
+  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxMidi/libs/rtmidi/RtMidi.h \
+  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxMidi/src/ofxMidiOut.h \
+  /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxMidi/src/desktop/ofxRtMidiOut.h
 
 /Users/davidjonas/Documents/Freelance/openFrameworks/apps/myApps/Painter/src/ofApp.h:
 
@@ -2463,3 +2473,23 @@ obj/osx/Release/src/ofApp.o: \
 /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxSyphon/src/ofxSyphonServer.h:
 
 /Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxSyphon/src/ofxSyphonServerDirectory.h:
+
+/Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxMidi/src/ofxMidi.h:
+
+/Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxMidi/src/ofxMidiIn.h:
+
+/Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxMidi/src/ofxBaseMidi.h:
+
+/Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxMidi/src/ofxMidiConstants.h:
+
+/Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxMidi/src/ofxMidiMessage.h:
+
+/Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxMidi/src/ofxMidiTypes.h:
+
+/Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxMidi/src/desktop/ofxRtMidiIn.h:
+
+/Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxMidi/libs/rtmidi/RtMidi.h:
+
+/Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxMidi/src/ofxMidiOut.h:
+
+/Users/davidjonas/Documents/Freelance/openFrameworks/addons/ofxMidi/src/desktop/ofxRtMidiOut.h:

@@ -23,6 +23,17 @@ void ofApp::setup(){
   setupPost();
   setupGUI();
 
+  //Text positions
+  textCenter.x = -500;
+  textCenter.y = 500;
+  textCenter.z = -1500;
+  textBoxWidth = 4000;
+  textBoxHeight = 2000;
+  textBoxDepth = 4000;
+  showCube = false;
+
+
+
   //Kinect initialization
   ofxKinect kinectCounter;
   kinects = kinectCounter.numTotalDevices();
@@ -60,6 +71,7 @@ void ofApp::setup(){
   orbitLongitude = 0;
   orbitRadius = 5800;
   orbitSpeed.x = 0.1;
+  shift = false;
   //targetOrbitSpeed = 0.1;
 
 
@@ -135,6 +147,10 @@ void ofApp::newMidiMessage(ofxMidiMessage& msg) {
   {
     warpOn = !warpOn;
   }
+  if(msg.control == 46 && msg.value == 127)
+  {
+    showCube = !showCube;
+  }
   if(msg.control == 3)
   {
     contrastValue = ofMap(msg.value, 0, 127,  0.0, 2.0);
@@ -146,6 +162,14 @@ void ofApp::newMidiMessage(ofxMidiMessage& msg) {
   if(msg.control == 5)
   {
     multipleValue = ofMap(msg.value, 0, 127,  0.0, 10.0);
+  }
+  if(msg.control == 20)
+  {
+    brightBoost = ofMap(msg.value, 0, 127,  0.0, 50);
+  }
+  if(msg.control == 19)
+  {
+    pointSize = ofMap(msg.value, 0, 127,  0.0, 50);
   }
   if(msg.control == 55 && msg.value == 127)
   {
@@ -178,21 +202,32 @@ void ofApp::newMidiMessage(ofxMidiMessage& msg) {
 
 void ofApp::setupGUI()
 {
-  gui.setup("Point Clouds", "pointcloudSettings.xml", 10, 260);
-  gui.add(focus.setup("Focus", 995, 988, 1000));
-  gui.add(aperture.setup("Aperture", 0.6, 0.1, 20));
-  gui.add(contrastValue.setup("Contrast Value", 1, 0.0, 2));
-  gui.add(brightnessValue.setup("Brightness Value", 2, 0.0, 10));
-  gui.add(multipleValue.setup("Multiple Value", 1, 0.0, 10));
-  gui.add(orbitCenterPoint.setup("Center of rotation", ofVec3f(0,0,-1800), ofVec3f(-2000, -2000, -2000), ofVec3f(3000, 3000, 3000)));
-  gui.add(orbitRadius.setup("Radius", 5800, 10, 10000));
-  gui.add(targetOrbitSpeed.setup("Orbit speed", ofVec2f(0.1,0.0), ofVec2f(-10.0,-10.0), ofVec2f(10.0,10.0)));
-  gui.add(color.setup("color", ofColor(100, 100, 100), ofColor(0, 0), ofColor(255, 255)));
-  gui.add(rgbImage.setup("RGB Image", true));
   guiActive = true;
+  focusGui.setup("Focus", "focusSettings.xml", 10, 260);
+  adjustmentGui.setup("Adjustment", "adjustmentSettings.xml", 100, 260);
+  rotationGui.setup("Rotation", "rotationSettings.xml", 200, 260);
+  colorGui.setup("Color", "colorSettings.xml", 300, 260);
+
+
+  focusGui.add(dofOn.setup("Depth of field", dof->getEnabled()));
+  focusGui.add(focus.setup("Focus", 995, 988, 1000));
+  focusGui.add(aperture.setup("Aperture", 0.6, 0.1, 20));
+
+  adjustmentGui.add(contrastValue.setup("Contrast", 1, 0.0, 2));
+  adjustmentGui.add(brightnessValue.setup("Brightness", 2, 0.0, 10));
+  adjustmentGui.add(multipleValue.setup("Multiple", 1, 0.0, 10));
+  adjustmentGui.add(brightBoost.setup("Bright Boost", 0, 0.0, 50));
+  adjustmentGui.add(pointSize.setup("pointSize", 5, 0.0, 50));
+
+  rotationGui.add(orbitCenterPoint.setup("Center of rotation", ofVec3f(0,0,-1800), ofVec3f(-2000, -2000, -2000), ofVec3f(3000, 3000, 3000)));
+  rotationGui.add(orbitRadius.setup("Radius", 5800, 10, 10000));
+  rotationGui.add(targetOrbitSpeed.setup("Orbit speed", ofVec2f(0.1,0.0), ofVec2f(-10.0,-10.0), ofVec2f(10.0,10.0)));
+
+  colorGui.add(color.setup("color", ofColor(100, 100, 100), ofColor(0, 0), ofColor(255, 255)));
+  colorGui.add(rgbImage.setup("RGB Image", true));
+
 
   postGui.setup("Effects", "effectsSettings.xml", 10, 10);
-  postGui.add(dofOn.setup("Depth of field", dof->getEnabled()));
   postGui.add(antiAliasOn.setup("Anti-alias", antiAlias->getEnabled()));
   postGui.add(bloomOn.setup("Bloom", bloom->getEnabled()));
   postGui.add(kaleidoscopeOn.setup("Kaleidoscope", kaleidoscope->getEnabled()));
@@ -204,7 +239,6 @@ void ofApp::setupGUI()
   postGui.add(tiltshiftOn.setup("Tilt Shift", tiltshift->getEnabled()));
   postGui.add(godraysOn.setup("God rays", godrays->getEnabled()));
   postGui.add(contrastOn.setup("Contrast", contrast->getEnabled()));
-  postGuiActive = true;
 }
 
 void ofApp::setupPost()
@@ -308,8 +342,9 @@ void ofApp::onSentenceEvent (ofxSocketIOData& data) {
   {
     Sentence s;
     s.sentence = txt;
-    s.position = ofVec3f(ofRandom(-1000, 1000), ofRandom(-2000, 2000), ofRandom(-6000, -1000));
-    //s.position = ofVec3f(-800, -((int)sentences.size() * 150) + 400, -1000);
+    //s.position = ofVec3f(ofRandom(textCenter.x-textBoxWidth/2, textCenter.x+textBoxWidth/2), ofRandom(textCenter.y-textBoxHeight/2, textCenter.y+textBoxHeight/2), ofRandom(textCenter.z-textBoxDepth/2, textCenter.z+textBoxDepth/2));
+    s.position = ofVec3f(-800, -((int)sentences.size() * 150) + 400, -1500);
+    //s.position = ofVec3f(0, 0, -1500);
     sentences[id] = s;
   }
   else
@@ -375,6 +410,12 @@ void ofApp::GUIUpdate()
   tiltshift->setEnabled(tiltshiftOn);
   godrays->setEnabled(godraysOn);
   contrast->setEnabled(contrastOn);
+
+  for(int i=0; i<kinects; i++)
+  {
+    clouds[i].brightBoost = brightBoost;
+    clouds[i].setPointSize(pointSize);
+  }
 }
 
 //--------------------------------------------------------------
@@ -386,6 +427,8 @@ void ofApp::draw(){
   post.begin();
   cam.begin();
     drawClouds();
+    ofNoFill();
+    if (showCube) ofDrawBox(textCenter.x, textCenter.y, textCenter.z, textBoxWidth, textBoxHeight, textBoxDepth);
     drawSentences();
   cam.end();
   post.end();
@@ -406,11 +449,10 @@ void ofApp::draw(){
 
   if(guiActive)
   {
-    gui.draw();
-  }
-
-  if(postGuiActive)
-  {
+    focusGui.draw();
+    adjustmentGui.draw();
+    rotationGui.draw();
+    colorGui.draw();
     postGui.draw();
   }
 }
@@ -460,7 +502,7 @@ void ofApp::handleCamera()
 
 	if(!camOrbit)
 	{
-    if(mouseControl)
+    if(mouseControl && shift)
     {
   		cam.rotate(mouseDeltaX/10.0, 0.0, 1.0, 0.0);
   		cam.tilt(mouseDeltaY/10.0);
@@ -494,7 +536,7 @@ void ofApp::resetCamera()
   orbitLatitude = 0;
   orbitLongitude = 0;
   orbitRadius = 1800;
-  orbitSpeed.x = 0.1;
+  orbitSpeed.x = 0.0;
   orbitSpeed.y = 0.0;
   targetOrbitSpeed = ofVec2f(0,0);
 }
@@ -619,7 +661,9 @@ void ofApp::keyPressed(int key){
       break;
     case '\t':
       guiActive = !guiActive;
-      postGuiActive = !postGuiActive;
+      break;
+    case OF_KEY_SHIFT:
+      shift = true;
       break;
   }
 
@@ -759,6 +803,10 @@ void ofApp::keyReleased(int key){
     case 'f':
       land = false;
       break;
+
+    case OF_KEY_SHIFT:
+      shift = false;
+      break;
 	}
 }
 
@@ -808,6 +856,7 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
 }
 
 void ofApp::exit() {
+  socketIO.closeConnection();;
   for(int i=0; i<kinects; i++)
   {
     clouds[i].close();

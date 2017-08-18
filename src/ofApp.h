@@ -12,6 +12,10 @@
 #include "ofxSyphon.h"
 #include "ofxMidi.h"
 
+# define OF_KEY_CTRL 0x0200
+# define OF_KEY_ALT 0x0300
+# define OF_KEY_SHIFT 0x0400
+
 class ofApp : public ofBaseApp, public ofxMidiListener{
 
 	public:
@@ -64,6 +68,7 @@ class ofApp : public ofBaseApp, public ofxMidiListener{
 		int mouseDeltaY;
 		bool camOrbit;
 		bool mouseControl;
+		bool shift;
 		bool synonyms;
 		bool listening;
 		float orbitLatitude;
@@ -89,21 +94,28 @@ class ofApp : public ofBaseApp, public ofxMidiListener{
 	  GodRaysPass::Ptr godrays;
 		ContrastPass::Ptr contrast;
 
-		//Main GUI
-		ofxPanel gui;
+		//GUI
+		bool guiActive;
+		ofxPanel focusGui;
 		ofxFloatSlider focus;
 		ofxFloatSlider aperture;
+
+		ofxPanel adjustmentGui;
 		ofxFloatSlider contrastValue;
 		ofxFloatSlider brightnessValue;
 		ofxFloatSlider multipleValue;
+		ofxFloatSlider brightBoost;
+		ofxIntSlider pointSize;
+
+		ofxPanel rotationGui;
 		ofxVec3Slider orbitCenterPoint;
 		ofxFloatSlider orbitRadius;
 		ofxVec2Slider targetOrbitSpeed;
+
+		ofxPanel colorGui;
 		ofxColorSlider color;
 		ofxToggle rgbImage;
-		bool guiActive;
 
-		//Effects GUI
 		ofxPanel postGui;
 		ofxToggle dofOn;
 		ofxToggle antiAliasOn;
@@ -117,7 +129,6 @@ class ofApp : public ofBaseApp, public ofxMidiListener{
 	  ofxToggle tiltshiftOn;
 	  ofxToggle godraysOn;
 		ofxToggle contrastOn;
-		bool postGuiActive;
 
     //SocketIO stuff
   	void onSpeechEvent(ofxSocketIOData& data);
@@ -157,4 +168,11 @@ class ofApp : public ofBaseApp, public ofxMidiListener{
 		//Midi stuff
 		ofxMidiIn midiIn;
 		void newMidiMessage(ofxMidiMessage& eventArgs);
+
+		//text positions
+		ofVec3f textCenter;
+		float textBoxWidth;
+		float textBoxHeight;
+		float textBoxDepth;
+		bool showCube;
 };

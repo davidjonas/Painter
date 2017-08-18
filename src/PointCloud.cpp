@@ -13,6 +13,7 @@ PointCloud::PointCloud()
   calibration.flipY = true;
   calibration.flipZ = true;
   calibration.angle = 0;
+  brightBoost = 0;
 }
 
 PointCloud::PointCloud(int index)
@@ -168,7 +169,7 @@ void PointCloud::draw()
   	for(int x = 0; x < width; x += sparcity) {
   		if(kinect->getDistanceAt(x, y) > 0) {
   			ofColor c = kinect->getColorAt(x,y);
-				//c.setBrightness(c.getBrightness() + 30);
+				c.setBrightness(c.getBrightness() + brightBoost);
   			mesh.addColor(c);
   			mesh.addVertex(kinect->getWorldCoordinateAt(x, y));
   		}

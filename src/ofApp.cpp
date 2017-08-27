@@ -31,6 +31,7 @@ void ofApp::setup(){
   textBoxHeight = 2000;
   textBoxDepth = 4000;
   showCube = false;
+  textErase = false;
 
 
 
@@ -92,7 +93,7 @@ void ofApp::setup(){
   ofAddListener(socketIO.notifyEvent, this, &ofApp::onNotice);
 
   //timer
-  delayTimer.setPeriod(1);
+  //delayTimer.setPeriod(1);
 }
 
 void ofApp::newMidiMessage(ofxMidiMessage& msg) {
@@ -135,6 +136,17 @@ void ofApp::newMidiMessage(ofxMidiMessage& msg) {
       convolutionOn = false;
     }
   }
+  if(msg.control == 44)
+  {
+    if(msg.value == 127)
+    {
+      textErase = true;
+    }
+    else
+    {
+      textErase = false;
+    }
+  }
   if(msg.control == 71 && msg.value == 127)
   {
     camOrbit = !camOrbit;
@@ -149,7 +161,7 @@ void ofApp::newMidiMessage(ofxMidiMessage& msg) {
   }
   if(msg.control == 46 && msg.value == 127)
   {
-    showCube = !showCube;
+    clearSentences();
   }
   if(msg.control == 3)
   {
@@ -194,6 +206,10 @@ void ofApp::newMidiMessage(ofxMidiMessage& msg) {
     fov = ofMap(msg.value, 0, 127,  16, 70);
     cam.setFov(fov);
   }
+  if(msg.control == 17)
+  {
+    textEraseSpeed = ofMap(msg.value, 0, 127,  1.0, 10.0);
+  }
   if(msg.control == 23)
   {
     orbitRadius = ofMap(msg.value, 0, 127,  10.0, 10000.0);
@@ -203,11 +219,12 @@ void ofApp::newMidiMessage(ofxMidiMessage& msg) {
 void ofApp::setupGUI()
 {
   guiActive = true;
-  focusGui.setup("Focus", "focusSettings.xml", 10, 260);
-  adjustmentGui.setup("Adjustment", "adjustmentSettings.xml", 100, 260);
-  rotationGui.setup("Rotation", "rotationSettings.xml", 200, 260);
-  colorGui.setup("Color", "colorSettings.xml", 300, 260);
-
+  postGui.setup("Effects", "effectsSettings.xml", 10, 10);
+  focusGui.setup("Focus", "focusSettings.xml", 220, 10);
+  adjustmentGui.setup("Adjustment", "adjustmentSettings.xml", 440, 10);
+  rotationGui.setup("Rotation", "rotationSettings.xml", 660, 10);
+  colorGui.setup("Color", "colorSettings.xml", 880, 10);
+  eraseGui.setup("Erase", "eraseSettings.xml", 990, 10);
 
   focusGui.add(dofOn.setup("Depth of field", dof->getEnabled()));
   focusGui.add(focus.setup("Focus", 995, 988, 1000));
@@ -226,8 +243,6 @@ void ofApp::setupGUI()
   colorGui.add(color.setup("color", ofColor(100, 100, 100), ofColor(0, 0), ofColor(255, 255)));
   colorGui.add(rgbImage.setup("RGB Image", true));
 
-
-  postGui.setup("Effects", "effectsSettings.xml", 10, 10);
   postGui.add(antiAliasOn.setup("Anti-alias", antiAlias->getEnabled()));
   postGui.add(bloomOn.setup("Bloom", bloom->getEnabled()));
   postGui.add(kaleidoscopeOn.setup("Kaleidoscope", kaleidoscope->getEnabled()));
@@ -239,6 +254,10 @@ void ofApp::setupGUI()
   postGui.add(tiltshiftOn.setup("Tilt Shift", tiltshift->getEnabled()));
   postGui.add(godraysOn.setup("God rays", godrays->getEnabled()));
   postGui.add(contrastOn.setup("Contrast", contrast->getEnabled()));
+
+  eraseGui.add(textErase.setup("Text erase", false));
+  eraseGui.add(textEraseSpeed.setup("Erase speed", 1.0, 1.0, 10.0));
+
 }
 
 void ofApp::setupPost()
@@ -342,9 +361,11 @@ void ofApp::onSentenceEvent (ofxSocketIOData& data) {
   {
     Sentence s;
     s.sentence = txt;
-    //s.position = ofVec3f(ofRandom(textCenter.x-textBoxWidth/2, textCenter.x+textBoxWidth/2), ofRandom(textCenter.y-textBoxHeight/2, textCenter.y+textBoxHeight/2), ofRandom(textCenter.z-textBoxDepth/2, textCenter.z+textBoxDepth/2));
-    s.position = ofVec3f(-800, -((int)sentences.size() * 150) + 400, -1500);
+    s.position = ofVec3f(ofRandom(textCenter.x-textBoxWidth/2, textCenter.x+textBoxWidth/2), ofRandom(textCenter.y-textBoxHeight/2, textCenter.y+textBoxHeight/2), ofRandom(textCenter.z-textBoxDepth/2, textCenter.z+textBoxDepth/2));
+    //s.position = ofVec3f(-800, -((int)sentences.size() * 150) + 400, -1500);
     //s.position = ofVec3f(0, 0, -1500);
+    s.active = true;
+    s.alpha = 255;
     sentences[id] = s;
   }
   else
@@ -353,16 +374,16 @@ void ofApp::onSentenceEvent (ofxSocketIOData& data) {
   }
 }
 
-void ofApp::handleTimers()
-{
-    if(delayTimer.tick() && sentences.size()>0)
-    {
-      unsigned i = roundf(ofRandom(0, sentences.size()-1));
-      string msg = "{\"msg\":\""+ sentences[i].sentence +"\", \"id\":" + to_string(i) + "}";
-      string evtName = "process_request";
-      socketIO.emit(evtName, msg);
-    }
-}
+// void ofApp::handleTimers()
+// {
+//     if(delayTimer.tick() && sentences.size()>0)
+//     {
+//       unsigned i = roundf(ofRandom(0, sentences.size()-1));
+//       string msg = "{\"msg\":\""+ sentences[i].sentence +"\", \"id\":" + to_string(i) + "}";
+//       string evtName = "process_request";
+//       socketIO.emit(evtName, msg);
+//     }
+// }
 
 //--------------------------------------------------------------
 void ofApp::update(){
@@ -381,11 +402,34 @@ void ofApp::update(){
     orbitSpeed.y += (targetOrbitSpeed->y - orbitSpeed.y) * 0.01;
   }
 
+  handleEraseText();
   GUIUpdate();
   handleCamera();
   for(int i=0; i<kinects; i++)
   {
     clouds[i].update();
+  }
+}
+
+void ofApp::handleEraseText()
+{
+  if(textErase)
+  {
+    for (unsigned i=0; i < sentences.size(); i++)
+    {
+      if(sentences[i].active)
+      {
+        if(sentences[i].alpha <= 0)
+        {
+          sentences[i].active = false;
+        }
+        else
+        {
+          sentences[i].alpha -= textEraseSpeed;
+          break;
+        }
+      }
+    }
   }
 }
 
@@ -454,6 +498,7 @@ void ofApp::draw(){
     rotationGui.draw();
     colorGui.draw();
     postGui.draw();
+    eraseGui.draw();
   }
 }
 
@@ -476,10 +521,14 @@ void ofApp::drawSentences()
 {
   for (unsigned i=0; i < sentences.size(); i++)
   {
-    ofPushMatrix();
-    ofTranslate(sentences[i].position);
-    textFont.drawString(sentences[i].sentence, 0, 0);
-    ofPopMatrix();
+    if(sentences[i].active)
+    {
+      ofPushMatrix();
+      ofSetColor(255,255,255,sentences[i].alpha);
+      ofTranslate(sentences[i].position);
+      textFont.drawString(sentences[i].sentence, 0, 0);
+      ofPopMatrix();
+    }
   }
 }
 
@@ -662,7 +711,7 @@ void ofApp::keyPressed(int key){
     case '\t':
       guiActive = !guiActive;
       break;
-    case OF_KEY_SHIFT:
+    case 'z':
       shift = true;
       break;
   }
@@ -804,7 +853,7 @@ void ofApp::keyReleased(int key){
       land = false;
       break;
 
-    case OF_KEY_SHIFT:
+    case 'z':
       shift = false;
       break;
 	}

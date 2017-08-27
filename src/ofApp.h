@@ -133,7 +133,7 @@ class ofApp : public ofBaseApp, public ofxMidiListener{
     //SocketIO stuff
   	void onSpeechEvent(ofxSocketIOData& data);
 		void onSentenceEvent(ofxSocketIOData& data);
-		void handleTimers();
+		//void handleTimers();
 
 
   	ofxSocketIO socketIO;
@@ -151,13 +151,15 @@ class ofApp : public ofBaseApp, public ofxMidiListener{
 		{
 			string sentence;
 			ofVec3f position;
+			float alpha;
+			bool active;
 			//DelayTimer delayTimer;
 		};
 
 		//vector<Sentence> sentences;
 		map<int, Sentence> sentences;
 		ofTrueTypeFont textFont;
-		DelayTimer delayTimer;
+		//DelayTimer delayTimer;
 
 		//Syphon stuff
 		ofxSyphonServer mainOutputSyphonServer;
@@ -175,4 +177,8 @@ class ofApp : public ofBaseApp, public ofxMidiListener{
 		float textBoxHeight;
 		float textBoxDepth;
 		bool showCube;
+		ofxPanel eraseGui;
+		ofxToggle textErase;
+		ofxFloatSlider textEraseSpeed;
+		void handleEraseText();
 };

@@ -55,7 +55,6 @@ class ofApp : public ofBaseApp, public ofxMidiListener{
 		int selectedCloud;
 
 		ofCamera cam;
-		float fov;
 		bool up;
 		bool down;
 		bool left;
@@ -73,12 +72,14 @@ class ofApp : public ofBaseApp, public ofxMidiListener{
 		bool listening;
 		float orbitLatitude;
 		float orbitLongitude;
+		bool resettingCamera;
 		//float orbitRadius;
 		ofVec2f orbitSpeed;
 		//ofVec2f targetOrbitSpeed;
 		//ofVec3f orbitCenterPoint;
-		ofVec3f initialCameraPosition;
+		//ofVec3f initialCameraPosition;
 		ofxPostProcessing post;
+		void toggleCamOrbit();
 
 		//post effects
 		DofPass::Ptr dof;
@@ -106,11 +107,19 @@ class ofApp : public ofBaseApp, public ofxMidiListener{
 		ofxFloatSlider multipleValue;
 		ofxFloatSlider brightBoost;
 		ofxIntSlider pointSize;
+		ofxIntSlider sparcity;
 
 		ofxPanel rotationGui;
 		ofxVec3Slider orbitCenterPoint;
 		ofxFloatSlider orbitRadius;
 		ofxVec2Slider targetOrbitSpeed;
+		ofxVec3Slider initialCameraPosition;
+		ofQuaternion initialCameraOrientation;
+		ofxFloatSlider cameraResetSpeed;
+		ofxFloatSlider depthFarClip;
+		ofxFloatSlider fov;
+		ofxFloatSlider globalAngle;
+		ofxVec3Slider globalAxis;
 
 		ofxPanel colorGui;
 		ofxColorSlider color;
@@ -133,6 +142,7 @@ class ofApp : public ofBaseApp, public ofxMidiListener{
     //SocketIO stuff
   	void onSpeechEvent(ofxSocketIOData& data);
 		void onSentenceEvent(ofxSocketIOData& data);
+		void onDreamEvent(ofxSocketIOData& data);
 		//void handleTimers();
 
 

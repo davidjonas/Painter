@@ -4,7 +4,7 @@
 	<Anti-alias>0</Anti-alias>
 	<Bloom>1</Bloom>
 	<Kaleidoscope>0</Kaleidoscope>
-	<Noise_Warp>0</Noise_Warp>
+	<Noise_Warp>1</Noise_Warp>
 	<Convolution>0</Convolution>
 	<Bleach>0</Bleach>
 	<Pixelate>0</Pixelate>

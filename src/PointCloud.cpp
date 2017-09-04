@@ -54,6 +54,7 @@ void PointCloud::init(int index)
   width = kinect->width;
   height = kinect->height;
   updateCameraTiltAngle();
+  kinect->setLed(ofxKinect::LED_OFF);
 }
 
 int PointCloud::getKinectIndex()
@@ -167,7 +168,7 @@ void PointCloud::draw()
 
   for(int y = 0; y < height; y += sparcity) {
   	for(int x = 0; x < width; x += sparcity) {
-  		if(kinect->getDistanceAt(x, y) > 0) {
+  		if(kinect->getDistanceAt(x, y) > 0 && kinect->getDistanceAt(x, y) < depthFarClip) {
   			ofColor c = kinect->getColorAt(x,y);
 				c.setBrightness(c.getBrightness() + brightBoost);
   			mesh.addColor(c);
@@ -198,7 +199,7 @@ void PointCloud::draw(ofColor c)
 
   for(int y = 0; y < height; y += sparcity) {
   	for(int x = 0; x < width; x += sparcity) {
-  		if(kinect->getDistanceAt(x, y) > 0) {
+  		if(kinect->getDistanceAt(x, y) > 0 && kinect->getDistanceAt(x, y) < depthFarClip) {
   			mesh.addColor(c);
         //c.setBrightness(c.getBrightness() + 30);
   			mesh.addVertex(kinect->getWorldCoordinateAt(x, y));
@@ -300,6 +301,9 @@ bool PointCloud::loadCalibration(string filename)
         calibration.position.z = jsonObject["position"][2].asFloat();
 
         calibration.angle = jsonObject["angle"].asFloat();
+        ofQuaternion qtAdd(calibration.angle, ofVec3f(1,0,0));
+        calibration.rotation = qtAdd;
+
       }
     } catch (exception msg)
     {

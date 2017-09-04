@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <Focus>
 	<Depth_of_field>1</Depth_of_field>
-	<Focus>997.732</Focus>
-	<Aperture>1.19685</Aperture>
+	<Focus>999.244</Focus>
+	<Aperture>0.883465</Aperture>
+	<FOV>20.2992</FOV>
 </Focus>

@@ -23,6 +23,8 @@ void ofApp::setup(){
   setupPost();
   setupGUI();
 
+  warp->setAmplitude(0);
+
   //Text positions
   textCenter.x = -500;
   textCenter.y = 500;
@@ -49,14 +51,16 @@ void ofApp::setup(){
   }
 
   //Camera initialization
-  initialCameraPosition.x = 0.0;
-  initialCameraPosition.y = 0.0;
-  initialCameraPosition.z = 1800;
+  //initialCameraPosition->x = 0.0;
+  //initialCameraPosition->y = 0.0;
+  //initialCameraPosition->z = 1800;
+  resettingCamera = false;
   cam = ofCamera();
   cam.setFarClip(100000);
-  fov = 30;
   cam.setFov(fov);
-  cam.setGlobalPosition(initialCameraPosition.x, initialCameraPosition.y, initialCameraPosition.z);
+  cam.setGlobalPosition(initialCameraPosition->x, initialCameraPosition->y, initialCameraPosition->z);
+  cam.lookAt(orbitCenterPoint);
+  initialCameraOrientation = cam.getGlobalOrientation();
 
   up = false;
   down = false;
@@ -68,10 +72,10 @@ void ofApp::setup(){
   pMouseY = mouseY;
   mouseControl = false;
   camOrbit = false;
-	orbitLatitude = 0;
+	orbitLatitude = 50;
   orbitLongitude = 0;
   orbitRadius = 5800;
-  orbitSpeed.x = 0.1;
+  orbitSpeed.x = 0.01;
   shift = false;
   //targetOrbitSpeed = 0.1;
 
@@ -149,7 +153,7 @@ void ofApp::newMidiMessage(ofxMidiMessage& msg) {
   }
   if(msg.control == 71 && msg.value == 127)
   {
-    camOrbit = !camOrbit;
+    toggleCamOrbit();
   }
   if(msg.control == 67 && msg.value == 127)
   {
@@ -179,9 +183,17 @@ void ofApp::newMidiMessage(ofxMidiMessage& msg) {
   {
     brightBoost = ofMap(msg.value, 0, 127,  0.0, 50);
   }
+  if(msg.control == 22)
+  {
+    cameraResetSpeed = ofMap(msg.value, 0, 127,  0.01, 0.2);
+  }
   if(msg.control == 19)
   {
     pointSize = ofMap(msg.value, 0, 127,  0.0, 50);
+  }
+  if(msg.control == 18)
+  {
+    sparcity = ofMap(msg.value, 0, 127,  1, 10);
   }
   if(msg.control == 55 && msg.value == 127)
   {
@@ -191,19 +203,23 @@ void ofApp::newMidiMessage(ofxMidiMessage& msg) {
   {
     targetOrbitSpeed = ofVec2f(targetOrbitSpeed->x, 0);
   }
+  if(msg.control == 39 && msg.value == 127)
+  {
+    resettingCamera = !resettingCamera;
+  }
   if(msg.control == 7)
   {
-    orbitSpeed.x = ofMap(msg.value, 0, 127,  -10, 10);
+    orbitSpeed.x = ofMap(msg.value, 0, 127,  0, 20);
     targetOrbitSpeed = orbitSpeed;
   }
   if(msg.control == 6)
   {
-    orbitSpeed.y = ofMap(msg.value, 0, 127,  -10, 10);
+    orbitSpeed.y = ofMap(msg.value, 0, 127,  0, 20);
     targetOrbitSpeed = orbitSpeed;
   }
   if(msg.control == 16)
   {
-    fov = ofMap(msg.value, 0, 127,  16, 70);
+    fov = ofMap(msg.value, 0, 127,  8, 150);
     cam.setFov(fov);
   }
   if(msg.control == 17)
@@ -212,7 +228,7 @@ void ofApp::newMidiMessage(ofxMidiMessage& msg) {
   }
   if(msg.control == 23)
   {
-    orbitRadius = ofMap(msg.value, 0, 127,  10.0, 10000.0);
+    orbitRadius = ofMap(msg.value, 0, 127,  5.0, 20000.0);
   }
 }
 
@@ -229,16 +245,26 @@ void ofApp::setupGUI()
   focusGui.add(dofOn.setup("Depth of field", dof->getEnabled()));
   focusGui.add(focus.setup("Focus", 995, 988, 1000));
   focusGui.add(aperture.setup("Aperture", 0.6, 0.1, 20));
+  focusGui.add(fov.setup("FOV", 16, 8, 150));
+
 
   adjustmentGui.add(contrastValue.setup("Contrast", 1, 0.0, 2));
   adjustmentGui.add(brightnessValue.setup("Brightness", 2, 0.0, 10));
   adjustmentGui.add(multipleValue.setup("Multiple", 1, 0.0, 10));
   adjustmentGui.add(brightBoost.setup("Bright Boost", 0, 0.0, 50));
-  adjustmentGui.add(pointSize.setup("pointSize", 5, 0.0, 50));
+  adjustmentGui.add(pointSize.setup("Point Size", 5, 0.0, 50));
+  adjustmentGui.add(sparcity.setup("Sparcity", 2, 1, 10));
 
   rotationGui.add(orbitCenterPoint.setup("Center of rotation", ofVec3f(0,0,-1800), ofVec3f(-2000, -2000, -2000), ofVec3f(3000, 3000, 3000)));
   rotationGui.add(orbitRadius.setup("Radius", 5800, 10, 10000));
-  rotationGui.add(targetOrbitSpeed.setup("Orbit speed", ofVec2f(0.1,0.0), ofVec2f(-10.0,-10.0), ofVec2f(10.0,10.0)));
+  rotationGui.add(targetOrbitSpeed.setup("Orbit speed", ofVec2f(0.01,0.0), ofVec2f(0.0,0.0), ofVec2f(20.0,20.0)));
+  rotationGui.add(initialCameraPosition.setup("Cam Zero Point", ofVec3f(0,0,1800), ofVec3f(-10000,-10000), ofVec3f(10000,10000)));
+  rotationGui.add(cameraResetSpeed.setup("Reset speed", 0.01, 0.01, 0.2));
+  rotationGui.add(depthFarClip.setup("Far Clip", 255, 0, 10000));
+  rotationGui.add(globalAngle.setup("Global rotation angle", 0, 0, 30));
+  rotationGui.add(globalAxis.setup("Global rotation axis", ofVec3f(0,0,1), ofVec3f(0,0,0), ofVec3f(1,1,1)));
+
+
 
   colorGui.add(color.setup("color", ofColor(100, 100, 100), ofColor(0, 0), ofColor(255, 255)));
   colorGui.add(rgbImage.setup("RGB Image", true));
@@ -257,6 +283,13 @@ void ofApp::setupGUI()
 
   eraseGui.add(textErase.setup("Text erase", false));
   eraseGui.add(textEraseSpeed.setup("Erase speed", 1.0, 1.0, 10.0));
+
+  postGui.loadFromFile("effectsSettings.xml");
+  focusGui.loadFromFile("focusSettings.xml");
+  adjustmentGui.loadFromFile("adjustmentSettings.xml");
+  rotationGui.loadFromFile("rotationSettings.xml");
+  colorGui.loadFromFile("colorSettings.xml");
+  eraseGui.loadFromFile("eraseSettings.xml");
 
 }
 
@@ -318,10 +351,6 @@ void ofApp::onNotice(string& name)
 }
 
 void ofApp::bindEvents () {
-  //std::string serverEventName = "speech";
-  //socketIO.bindEvent(speechEvent, serverEventName);
-  //ofAddListener(speechEvent, this, &ofApp::onSpeechEvent);
-
   std::string sentenceEventName = "sentence";
   socketIO.bindEvent(sentenceEvent, sentenceEventName);
   ofAddListener(sentenceEvent, this, &ofApp::onSentenceEvent);
@@ -331,22 +360,6 @@ void ofApp::subscribeEvents() {
   std::string msg = "subscribe";
   std::string type = "sentence";
   socketIO.emit(msg, type);
-
-  //std::string type2 = "speech";
-  //socketIO.emit(msg, type2);
-}
-
-//NOTE: Not called anymore, oonly receiving sentence events
-void ofApp::onSpeechEvent (ofxSocketIOData& data) {
-  if(listening)
-  {
-    //Sentence s;
-    //s.sentence = data.getStringValue("msg");
-    //s.position = ofVec3f(ofRandom(-1000, 1000), ofRandom(-2000, 2000), ofRandom(-6000, -1000));
-    //s.position = ofVec3f(-800, -((int)sentences.size() * 150) + 400, -1000);
-    ////s.delayTimer.setPeriod(ofRandom(3, 7));
-    //sentences.push_back(s);
-  }
 }
 
 void ofApp::onSentenceEvent (ofxSocketIOData& data) {
@@ -374,32 +387,39 @@ void ofApp::onSentenceEvent (ofxSocketIOData& data) {
   }
 }
 
-// void ofApp::handleTimers()
-// {
-//     if(delayTimer.tick() && sentences.size()>0)
-//     {
-//       unsigned i = roundf(ofRandom(0, sentences.size()-1));
-//       string msg = "{\"msg\":\""+ sentences[i].sentence +"\", \"id\":" + to_string(i) + "}";
-//       string evtName = "process_request";
-//       socketIO.emit(evtName, msg);
-//     }
-// }
-
 //--------------------------------------------------------------
 void ofApp::update(){
-  if(synonyms)
+  // if(synonyms)
+  // {
+  //     //handleTimers();
+  // }
+
+  if(resettingCamera)
   {
-      //handleTimers();
+    resetCamera();
   }
 
-  if(targetOrbitSpeed->x - orbitSpeed.x > 0.1 || targetOrbitSpeed->x - orbitSpeed.x < -0.1)
+  if(targetOrbitSpeed->x - orbitSpeed.x > 0.01 || targetOrbitSpeed->x - orbitSpeed.x < -0.01)
   {
     orbitSpeed.x += (targetOrbitSpeed->x - orbitSpeed.x) * 0.01;
   }
+  else
+  {
+    orbitSpeed.x = targetOrbitSpeed->x;
+  }
 
-  if(targetOrbitSpeed->y - orbitSpeed.y > 0.1 || targetOrbitSpeed->y - orbitSpeed.y < -0.1)
+  if(targetOrbitSpeed->y - orbitSpeed.y > 0.01 || targetOrbitSpeed->y - orbitSpeed.y < -0.01)
   {
     orbitSpeed.y += (targetOrbitSpeed->y - orbitSpeed.y) * 0.01;
+  }
+  else
+  {
+    orbitSpeed.y = targetOrbitSpeed->y;
+  }
+
+  if(orbitSpeed.y == 0)
+  {
+    orbitLongitude += (0 - orbitLongitude) * 0.01;
   }
 
   handleEraseText();
@@ -459,6 +479,8 @@ void ofApp::GUIUpdate()
   {
     clouds[i].brightBoost = brightBoost;
     clouds[i].setPointSize(pointSize);
+    clouds[i].setSparcity(sparcity);
+    clouds[i].depthFarClip = depthFarClip;
   }
 }
 
@@ -470,7 +492,10 @@ void ofApp::draw(){
   if(syphonOn)  frame.begin();
   post.begin();
   cam.begin();
+    ofPushMatrix();
+    ofRotate(globalAngle, globalAxis->x, globalAxis->y, globalAxis->z);
     drawClouds();
+    ofPopMatrix();
     ofNoFill();
     if (showCube) ofDrawBox(textCenter.x, textCenter.y, textCenter.z, textBoxWidth, textBoxHeight, textBoxDepth);
     drawSentences();
@@ -500,6 +525,12 @@ void ofApp::draw(){
     postGui.draw();
     eraseGui.draw();
   }
+
+  if(resettingCamera)
+  {
+    ofSetColor(255,0,0);
+    ofDrawEllipse(ofGetWindowWidth() - 20, 10, 10, 10);
+  }
 }
 
 void ofApp::drawClouds()
@@ -519,6 +550,8 @@ void ofApp::drawClouds()
 
 void ofApp::drawSentences()
 {
+  ofPushMatrix();
+  ofRotate(45,0,1,0);
   for (unsigned i=0; i < sentences.size(); i++)
   {
     if(sentences[i].active)
@@ -530,6 +563,7 @@ void ofApp::drawSentences()
       ofPopMatrix();
     }
   }
+  ofPopMatrix();
 }
 
 //--------------------------------------------------------------
@@ -574,20 +608,33 @@ void ofApp::handleCamera()
   if(land) cam.boom(-50);
 }
 
+void ofApp::toggleCamOrbit()
+{
+  if(camOrbit)
+  {
+    camOrbit = false;
+  }
+  else
+  {
+    orbitRadius = ofDist(cam.getGlobalPosition().x, cam.getGlobalPosition().y, cam.getGlobalPosition().z, orbitCenterPoint->x, orbitCenterPoint->y, orbitCenterPoint->z);
+    camOrbit = true;
+  }
+}
+
 void ofApp::resetCamera()
 {
-  cam = ofCamera();
-  cam.setFarClip(100000);
-  fov = 30;
-  cam.setFov(fov);
-  cam.setGlobalPosition(initialCameraPosition.x, initialCameraPosition.y, initialCameraPosition.z);
   camOrbit = false;
-  orbitLatitude = 0;
+  targetOrbitSpeed = ofVec2f(0.01,0);
+  orbitLatitude = 50;
   orbitLongitude = 0;
-  orbitRadius = 1800;
-  orbitSpeed.x = 0.0;
-  orbitSpeed.y = 0.0;
-  targetOrbitSpeed = ofVec2f(0,0);
+  ofVec3f lerpPos = cam.getGlobalPosition();
+  lerpPos.x += (initialCameraPosition->x - lerpPos.x) * cameraResetSpeed;
+	lerpPos.y += (initialCameraPosition->y - lerpPos.y) * cameraResetSpeed;
+	lerpPos.z += (initialCameraPosition->z - lerpPos.z) * cameraResetSpeed;
+  cam.setGlobalPosition(lerpPos);
+  ofQuaternion tweenedCameraQuaternion;
+  tweenedCameraQuaternion.slerp(cameraResetSpeed, cam.getGlobalOrientation(), initialCameraOrientation);
+  cam.setGlobalOrientation(tweenedCameraQuaternion);
 }
 
 void ofApp::clearSentences()
@@ -660,7 +707,7 @@ void ofApp::keyPressed(int key){
       break;
 
     case 'o':
-      camOrbit = !camOrbit;
+      toggleCamOrbit();
       break;
 
     case 'c':
@@ -692,11 +739,11 @@ void ofApp::keyPressed(int key){
       break;
 
     case 'u':
-      fov++;
+      fov = fov + 1;
       cam.setFov(fov);
       break;
     case 'j':
-      fov--;
+      fov = fov -1;
       cam.setFov(fov);
       break;
     case '/':
@@ -714,6 +761,8 @@ void ofApp::keyPressed(int key){
     case 'z':
       shift = true;
       break;
+    case 'm':
+      initialCameraPosition = cam.getGlobalPosition();
   }
 
   if(calibration)

@@ -22,6 +22,7 @@ class PointCloud {
     ofxCvGrayscaleImage depthImage;
     int kinectAngle;
     float brightBoost;
+    float depthFarClip;
 
     ofxJSON jsonObject;
 

@@ -6,7 +6,7 @@ void ofApp::setup(){
 
   //Syphon stuff
   mainOutputSyphonServer.setName("Screen Output");
-  frame.allocate(2950,800, GL_RGBA);
+  frame.allocate(2770,720, GL_RGBA);
   syphonOn = true;
 
 
@@ -26,9 +26,9 @@ void ofApp::setup(){
   warp->setAmplitude(0);
 
   //Text positions
-  textCenter.x = -500;
-  textCenter.y = 500;
-  textCenter.z = -1500;
+  textCenter.x = 1000;
+  textCenter.y = -100;
+  textCenter.z = 100;
   textBoxWidth = 4000;
   textBoxHeight = 2000;
   textBoxDepth = 4000;
@@ -72,7 +72,7 @@ void ofApp::setup(){
   pMouseY = mouseY;
   mouseControl = false;
   camOrbit = false;
-	orbitLatitude = 50;
+	orbitLatitude = -90;
   orbitLongitude = 0;
   orbitRadius = 5800;
   orbitSpeed.x = 0.01;
@@ -96,8 +96,114 @@ void ofApp::setup(){
 	ofAddListener(socketIO.connectionEvent, this, &ofApp::onConnection);
   ofAddListener(socketIO.notifyEvent, this, &ofApp::onNotice);
 
-  //timer
-  //delayTimer.setPeriod(1);
+  //Alice model
+  setupModel();
+
+  //Shots
+  setupShots("shots_");
+  directorMode = false;
+
+}
+
+void ofApp::setupShots(string filePrefix){
+  ofxJSON jsonObject;
+
+  for(int i=0; i<9; i++)
+  {
+    string filename = filePrefix + to_string(i) + ".json";
+
+    string path = "/Users/davidjonas/Documents/Freelance/OpenFrameworks/apps/myApps/Painter/bin/data/" + filename;
+
+    ofVec3f camPos;
+    ofVec3f t;
+
+    if (FILE *file = fopen(path.c_str(), "r"))
+    {
+      fclose(file);
+      bool parsingSuccessful = jsonObject.open(path);
+
+      try {
+        if (parsingSuccessful)
+        {
+          ofLogNotice("Shots: ", "Loading shot "+ to_string(i) +"...");
+          camPos.x = jsonObject["position"][0].asFloat();
+          camPos.y = jsonObject["position"][1].asFloat();
+          camPos.z = jsonObject["position"][2].asFloat();
+
+          t.x = jsonObject["target"][0].asFloat();
+          t.y = jsonObject["target"][1].asFloat();
+          t.z = jsonObject["target"][2].asFloat();
+        }
+        else {
+            ofLogNotice("Shots: ", "Parsing failed...");
+        }
+      } catch (exception msg)
+      {
+        ofLogNotice("Shots: ", "Loading failed...");
+        ofLogNotice("Shots: %s", msg.what());
+      }
+    }
+    else {
+      ofLogNotice("Shots: ", "File not found...");
+    }
+
+    shots[i].cameraPosition = camPos;
+    shots[i].target = t;
+  }
+}
+
+void ofApp::saveShots(string filePrefix){
+  ofxJSON jsonObject;
+
+  for(int i=0; i<9; i++)
+  {
+    string filename = filePrefix + to_string(i) + ".json";
+    ofstream ss;
+
+    string path = "/Users/davidjonas/Documents/Freelance/OpenFrameworks/apps/myApps/Painter/bin/data/" + filename;
+
+    ss.open(path, ios::out);
+
+    if(ss.is_open()) {
+      ofLogNotice("Shots: ", "Saving shots...");
+      ss << "{\"position\": " << "[ " << shots[i].cameraPosition.x << ", " <<  shots[i].cameraPosition.y << ", " <<  shots[i].cameraPosition.z << "]" << ",";
+      ss << "\"target\": " << "[ " << shots[i].target.x << ", " <<  shots[i].target.y << ", " << shots[i].target.z << "]";
+      ss << "}";
+
+      ss.close();
+    }
+    else
+    {
+      ofLogNotice("Shots: ", "Error opening file for writing...");
+    }
+  }
+}
+
+void ofApp::applyShot(int index){
+  orbitCenterPoint = shots[index].target;
+  orbitRadius = ofDist(cam.getGlobalPosition().x, cam.getGlobalPosition().y, cam.getGlobalPosition().z, orbitCenterPoint->x, orbitCenterPoint->y, orbitCenterPoint->z);
+
+  cam.setGlobalPosition(shots[index].cameraPosition.x, shots[index].cameraPosition.y, shots[index].cameraPosition.z);
+  cam.lookAt(shots[index].target, cam.getUpDir());
+}
+
+void ofApp::setShot(int index){
+  shots[index].cameraPosition = cam.getGlobalPosition();
+  shots[index].target = cam.getLookAtDir();
+  shots[index].target = cam.getGlobalPosition() + (shots[index].target.getNormalized() * ofMap(focus, 988.0, 1000.0, 10, 5000));
+}
+
+void ofApp::setupModel(){
+  model.init("AliceAnimated.fbx");
+  model.setScale(500, 500, 500);
+  model.setNoiseLevel(0.08);
+	model.setPosition(ofVec3f(0, -1000, -1500));
+  model.setColor(ofColor(255,80,80));
+	model.setRotation(ofVec3f(0,180,0));
+	model.setPointSize(1);
+	model.setPointMode(true);
+	//light.setPosition(orbitCenterPoint->x, orbitCenterPoint->y, orbitCenterPoint->z); //TODO:This is a test, it should be on setupLight function.
+  ofLogNotice("PointModel", "Model setup successful");
 }
 
 void ofApp::newMidiMessage(ofxMidiMessage& msg) {
@@ -228,7 +334,12 @@ void ofApp::newMidiMessage(ofxMidiMessage& msg) {
   }
   if(msg.control == 23)
   {
-    orbitRadius = ofMap(msg.value, 0, 127,  5.0, 20000.0);
+    orbitRadius = ofMap(msg.value, 0, 127,  12326.0, 20000.0);
+  }
+
+  if(msg.control == 21)
+  {
+    model.setScale(ofMap(msg.value, 0, 127,  0, 1000), ofMap(msg.value, 0, 127,  0, 1000), ofMap(msg.value, 0, 127,  0, 1000));
   }
 }
 
@@ -240,7 +351,16 @@ void ofApp::setupGUI()
   adjustmentGui.setup("Adjustment", "adjustmentSettings.xml", 440, 10);
   rotationGui.setup("Rotation", "rotationSettings.xml", 660, 10);
   colorGui.setup("Color", "colorSettings.xml", 880, 10);
-  eraseGui.setup("Erase", "eraseSettings.xml", 990, 10);
+  eraseGui.setup("Erase", "eraseSettings.xml", 1100, 10);
+  aliceGui.setup("Alice", "aliceSettings.xml", 220, 120);
+
+  aliceGui.add(aliceOn.setup("Alice", false));
+  aliceGui.add(alicePosition.setup("Alice Position", ofVec3f(0, -1000, -1500), ofVec3f(0, -2000, -2000), ofVec3f(0, 2000, 2000)));
+  aliceGui.add(aliceRotation.setup("Alice Rotation", ofVec3f(0, 0, 0), ofVec3f(0, 0, 0), ofVec3f(360, 360, 360)));
+  aliceGui.add(aliceScale.setup("Alice scale", 300, 0, 1000));
+  aliceGui.add(alicePointSize.setup("Alice pointSize", 1, 1, 5));
+  aliceGui.add(aliceFade.setup("Alice fade", 0, 0, 255));
+
 
   focusGui.add(dofOn.setup("Depth of field", dof->getEnabled()));
   focusGui.add(focus.setup("Focus", 995, 988, 1000));
@@ -256,15 +376,13 @@ void ofApp::setupGUI()
   adjustmentGui.add(sparcity.setup("Sparcity", 2, 1, 10));
 
   rotationGui.add(orbitCenterPoint.setup("Center of rotation", ofVec3f(0,0,-1800), ofVec3f(-2000, -2000, -2000), ofVec3f(3000, 3000, 3000)));
-  rotationGui.add(orbitRadius.setup("Radius", 5800, 10, 10000));
+  rotationGui.add(orbitRadius.setup("Radius", 12326, 12326, 50000));
   rotationGui.add(targetOrbitSpeed.setup("Orbit speed", ofVec2f(0.01,0.0), ofVec2f(0.0,0.0), ofVec2f(20.0,20.0)));
   rotationGui.add(initialCameraPosition.setup("Cam Zero Point", ofVec3f(0,0,1800), ofVec3f(-10000,-10000), ofVec3f(10000,10000)));
   rotationGui.add(cameraResetSpeed.setup("Reset speed", 0.01, 0.01, 0.2));
   rotationGui.add(depthFarClip.setup("Far Clip", 255, 0, 10000));
   rotationGui.add(globalAngle.setup("Global rotation angle", 0, 0, 30));
   rotationGui.add(globalAxis.setup("Global rotation axis", ofVec3f(0,0,1), ofVec3f(0,0,0), ofVec3f(1,1,1)));
-
-
 
   colorGui.add(color.setup("color", ofColor(100, 100, 100), ofColor(0, 0), ofColor(255, 255)));
   colorGui.add(rgbImage.setup("RGB Image", true));
@@ -283,6 +401,7 @@ void ofApp::setupGUI()
 
   eraseGui.add(textErase.setup("Text erase", false));
   eraseGui.add(textEraseSpeed.setup("Erase speed", 1.0, 1.0, 10.0));
+  eraseGui.add(textOffset.setup("Text Offset", ofVec3f(0,0,0), ofVec3f(-4000,-4000,-4000), ofVec3f(4000,4000,4000)));
 
   postGui.loadFromFile("effectsSettings.xml");
   focusGui.loadFromFile("focusSettings.xml");
@@ -290,12 +409,13 @@ void ofApp::setupGUI()
   rotationGui.loadFromFile("rotationSettings.xml");
   colorGui.loadFromFile("colorSettings.xml");
   eraseGui.loadFromFile("eraseSettings.xml");
+  aliceGui.loadFromFile("aliceSettings.xml");
 
 }
 
 void ofApp::setupPost()
 {
-  post.init(2950,800);
+  post.init(2770,720);
 
   dof = post.createPass<DofPass>();
   dof->setEnabled(true);
@@ -374,7 +494,7 @@ void ofApp::onSentenceEvent (ofxSocketIOData& data) {
   {
     Sentence s;
     s.sentence = txt;
-    s.position = ofVec3f(ofRandom(textCenter.x-textBoxWidth/2, textCenter.x+textBoxWidth/2), ofRandom(textCenter.y-textBoxHeight/2, textCenter.y+textBoxHeight/2), ofRandom(textCenter.z-textBoxDepth/2, textCenter.z+textBoxDepth/2));
+    s.position = ofVec3f(ofRandom(textCenter.z-textBoxDepth, textCenter.z+textBoxDepth), ofRandom(textCenter.y-textBoxHeight/2, textCenter.y+textBoxHeight/2), ofRandom(textCenter.x-textBoxWidth/2, textCenter.x+textBoxWidth/2));
     //s.position = ofVec3f(-800, -((int)sentences.size() * 150) + 400, -1500);
     //s.position = ofVec3f(0, 0, -1500);
     s.active = true;
@@ -389,6 +509,7 @@ void ofApp::onSentenceEvent (ofxSocketIOData& data) {
 
 //--------------------------------------------------------------
 void ofApp::update(){
+  model.update();
   // if(synonyms)
   // {
   //     //handleTimers();
@@ -399,14 +520,16 @@ void ofApp::update(){
     resetCamera();
   }
 
-  if(targetOrbitSpeed->x - orbitSpeed.x > 0.01 || targetOrbitSpeed->x - orbitSpeed.x < -0.01)
-  {
-    orbitSpeed.x += (targetOrbitSpeed->x - orbitSpeed.x) * 0.01;
-  }
-  else
-  {
-    orbitSpeed.x = targetOrbitSpeed->x;
-  }
+  float scaledOrbitSpeed = (targetOrbitSpeed->x * targetOrbitSpeed->x)/20.0;
+
+  //if(scaledOrbitSpeed - orbitSpeed.x > 0.001 || scaledOrbitSpeed - orbitSpeed.x < -0.001)
+  //{
+  //  orbitSpeed.x += (scaledOrbitSpeed - orbitSpeed.x) * 0.001;
+  //}
+  //else
+  //{
+  orbitSpeed.x = scaledOrbitSpeed;
+  //}
 
   if(targetOrbitSpeed->y - orbitSpeed.y > 0.01 || targetOrbitSpeed->y - orbitSpeed.y < -0.01)
   {
@@ -475,6 +598,12 @@ void ofApp::GUIUpdate()
   godrays->setEnabled(godraysOn);
   contrast->setEnabled(contrastOn);
 
+  model.setScale(aliceScale, aliceScale, aliceScale);
+  model.setPosition(alicePosition->x, alicePosition->y, alicePosition->z);
+  model.setRotation(aliceRotation->x, aliceRotation->y, aliceRotation->z);
+  model.setColor(ofColor(aliceFade, aliceFade, aliceFade));
+  model.setPointSize(alicePointSize);
+
   for(int i=0; i<kinects; i++)
   {
     clouds[i].brightBoost = brightBoost;
@@ -492,12 +621,37 @@ void ofApp::draw(){
   if(syphonOn)  frame.begin();
   post.begin();
   cam.begin();
+    //light.enable();
+
     ofPushMatrix();
-    ofRotate(globalAngle, globalAxis->x, globalAxis->y, globalAxis->z);
-    drawClouds();
+      ofRotate(globalAngle, globalAxis->x, globalAxis->y, globalAxis->z);
+      drawClouds();
     ofPopMatrix();
+
     ofNoFill();
-    if (showCube) ofDrawBox(textCenter.x, textCenter.y, textCenter.z, textBoxWidth, textBoxHeight, textBoxDepth);
+
+    if(aliceOn)
+    {
+      model.draw();
+    }
+
+    if (showCube)
+    {
+      ofDrawSphere(textCenter.x, textCenter.y, textCenter.z, 50);
+      ofDrawBox(textCenter.x, textCenter.y, textCenter.z, textBoxWidth, textBoxHeight, textBoxDepth);
+    }
+
+    ofVec3f t = cam.getLookAtDir();
+    float f = ofMap(focus, 988.0, 1000.0, 10, 5000 );
+    t = cam.getGlobalPosition() + (t.getNormalized() * f);
+
+    if(directorMode)
+    {
+      ofSetColor(255,0,0);
+      ofDrawSphere(t.x, t.y, t.z, 50);
+    }
+
+    //light.disable();
     drawSentences();
   cam.end();
   post.end();
@@ -505,10 +659,15 @@ void ofApp::draw(){
 
   if(syphonOn)  mainOutputSyphonServer.publishTexture(&frame.getTexture());
 
-
   if(calibration)
   {
     drawCalibration();
+  }
+
+  if(directorMode)
+  {
+    ofDrawBitmapString("Target: " + to_string(t.x) + ", " + to_string(t.y) + "," + to_string(t.z) + " --> " + to_string(f), 100, 100);
+    ofDrawBitmapString("Cam: " + to_string(cam.getGlobalPosition().x) + ", " + to_string(cam.getGlobalPosition().y) + "," + to_string(cam.getGlobalPosition().z), 100, 150);
   }
 
   if(debug)
@@ -524,12 +683,19 @@ void ofApp::draw(){
     colorGui.draw();
     postGui.draw();
     eraseGui.draw();
+    aliceGui.draw();
   }
 
   if(resettingCamera)
   {
     ofSetColor(255,0,0);
     ofDrawEllipse(ofGetWindowWidth() - 20, 10, 10, 10);
+  }
+
+  if(directorMode)
+  {
+    ofSetColor(0,255,0);
+    ofDrawEllipse(ofGetWindowWidth() - 40, 10, 10, 10);
   }
 }
 
@@ -551,7 +717,8 @@ void ofApp::drawClouds()
 void ofApp::drawSentences()
 {
   ofPushMatrix();
-  ofRotate(45,0,1,0);
+  ofRotate(-90,0,1,0);
+  ofTranslate(textOffset->x, textOffset->y, textOffset->z);
   for (unsigned i=0; i < sentences.size(); i++)
   {
     if(sentences[i].active)
@@ -625,7 +792,7 @@ void ofApp::resetCamera()
 {
   camOrbit = false;
   targetOrbitSpeed = ofVec2f(0.01,0);
-  orbitLatitude = 50;
+  orbitLatitude = -90;
   orbitLongitude = 0;
   ofVec3f lerpPos = cam.getGlobalPosition();
   lerpPos.x += (initialCameraPosition->x - lerpPos.x) * cameraResetSpeed;
@@ -659,14 +826,6 @@ void ofApp::drawDebug(){
 
   //Calibration data
   drawCalibration();
-
-  cam.begin();
-  ofPushMatrix();
-  ofEnableDepthTest();
-	ofDrawSphere(orbitCenterPoint->x, orbitCenterPoint->y, orbitCenterPoint->z, 10);
-	ofDisableDepthTest();
-	ofPopMatrix();
-  cam.end();
 }
 
 void ofApp::drawCalibration()
@@ -763,6 +922,98 @@ void ofApp::keyPressed(int key){
       break;
     case 'm':
       initialCameraPosition = cam.getGlobalPosition();
+      break;
+    case 'g':
+      directorMode = !directorMode;
+      break;
+  }
+
+  if(!calibration && !directorMode)
+  {
+    switch(key)
+    {
+      case '1':
+        applyShot(0);
+        break;
+
+      case '2':
+        applyShot(1);
+        break;
+
+      case '3':
+        applyShot(2);
+        break;
+
+      case '4':
+        applyShot(3);
+        break;
+
+      case '5':
+        applyShot(4);
+        break;
+
+      case '6':
+        applyShot(5);
+        break;
+
+      case '7':
+        applyShot(6);
+        break;
+
+      case '8':
+        applyShot(7);
+        break;
+
+      case '9':
+        applyShot(8);
+        break;
+    }
+  }
+
+  if(directorMode)
+  {
+    switch(key)
+    {
+      case '1':
+        setShot(0);
+        break;
+
+      case '2':
+        setShot(1);
+        break;
+
+      case '3':
+        setShot(2);
+        break;
+
+      case '4':
+        setShot(3);
+        break;
+
+      case '5':
+        setShot(4);
+        break;
+
+      case '6':
+        setShot(5);
+        break;
+
+      case '7':
+        setShot(6);
+        break;
+
+      case '8':
+        setShot(7);
+        break;
+
+      case '9':
+        setShot(8);
+        break;
+
+      case ' ':
+        saveShots("shots_");
+        break;
+    }
   }
 
   if(calibration)
@@ -837,6 +1088,7 @@ void ofApp::keyPressed(int key){
       case ' ':
         clouds[selectedCloud].saveCalibration(clouds[selectedCloud].kinect->getSerial() + ".json");
         break;
+
       case 'i':
         for(int i=0; i<kinects; i++)
         {

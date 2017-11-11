@@ -11,6 +11,7 @@
 #include "ofxGui.h"
 #include "ofxSyphon.h"
 #include "ofxMidi.h"
+#include "PointModel.h"
 
 # define OF_KEY_CTRL 0x0200
 # define OF_KEY_ALT 0x0300
@@ -101,6 +102,14 @@ class ofApp : public ofBaseApp, public ofxMidiListener{
 		ofxFloatSlider focus;
 		ofxFloatSlider aperture;
 
+		ofxPanel aliceGui;
+		ofxFloatSlider aliceScale;
+		ofxVec3Slider alicePosition;
+		ofxVec3Slider aliceRotation;
+		ofxFloatSlider aliceFade;
+		ofxToggle aliceOn;
+		ofxIntSlider alicePointSize;
+
 		ofxPanel adjustmentGui;
 		ofxFloatSlider contrastValue;
 		ofxFloatSlider brightnessValue;
@@ -163,13 +172,25 @@ class ofApp : public ofBaseApp, public ofxMidiListener{
 			ofVec3f position;
 			float alpha;
 			bool active;
-			//DelayTimer delayTimer;
 		};
 
-		//vector<Sentence> sentences;
 		map<int, Sentence> sentences;
 		ofTrueTypeFont textFont;
-		//DelayTimer delayTimer;
+
+		//Camera angles
+		bool directorMode;
+
+		struct CameraAngle
+		{
+			ofVec3f cameraPosition;
+			ofVec3f target;
+		};
+
+		CameraAngle shots[9];
+		void setupShots(string filePrefix);
+		void applyShot(int index);
+		void setShot(int index);
+		void saveShots(string filePrefix);
 
 		//Syphon stuff
 		ofxSyphonServer mainOutputSyphonServer;
@@ -190,5 +211,11 @@ class ofApp : public ofBaseApp, public ofxMidiListener{
 		ofxPanel eraseGui;
 		ofxToggle textErase;
 		ofxFloatSlider textEraseSpeed;
+		ofxVec3Slider textOffset;
 		void handleEraseText();
+
+		//Alice's ghost
+		void setupModel();
+		PointModel model;
+		ofLight	light;
 };

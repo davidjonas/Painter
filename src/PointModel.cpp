@@ -28,6 +28,7 @@ void PointModel::init(string filename)
   {
     model.setLoopStateForAllAnimations(OF_LOOP_NORMAL);
     model.playAllAnimations();
+    ofLogNotice("PointModel", "Animation loaded");
   }
 }
 
@@ -57,6 +58,13 @@ void PointModel::setPosition(ofVec3f point){
   position = point;
 }
 
+void PointModel::setPosition(float x, float y, float z)
+{
+  position.x = x;
+  position.y = y;
+  position.z = z;
+}
+
 void PointModel::setPointMode(bool value)
 {
   pointMode = value;
@@ -70,43 +78,54 @@ void PointModel::setRotation(ofVec3f euler){
   rotation = euler;
 }
 
+void PointModel::setRotation(float x, float y, float z){
+  rotation.x = x;
+  rotation.y = y;
+  rotation.z = z;
+}
+
+void PointModel::update()
+{
+  model.update();
+}
+
 void PointModel::draw(){
   ofEnableDepthTest();
+    ofPushMatrix();
+      glPointSize(pointSize);
+      ofSetColor(pointColor);
 
-  ofPushMatrix();
-  //glPointSize(pointSize);
-  ofColor(pointColor);
-  ofRotate(rotation.x, 1,0,0);
-  ofRotate(rotation.y, 0,1,0);
-  ofRotate(rotation.z, 0,0,1);
-  ofScale(scale.x, scale.y, scale.z);
-  ofTranslate(position.x, position.y, position.z);
+      ofTranslate(position.x, position.y, position.z);
+      ofRotate(rotation.x, 1,0,0);
+      ofRotate(rotation.y, 0,1,0);
+      ofRotate(rotation.z, 0,0,1);
+      ofScale(scale.x, scale.y, scale.z);
 
-  model.update();
 
-  for(int m=0; m<model.getNumMeshes(); m++)
-  {
-    if(model.hasAnimations())
-    {
-      mesh = model.getCurrentAnimatedMesh(m);
-    }
-    else
-    {
-      mesh = model.getMesh(m);
-    }
-    for(int i=0; i<mesh.getNumVertices(); i++){
-        mesh.setVertex(i, mesh.getVertex(i) + ofVec3f(ofRandomuf() * noiseLevel,ofRandomuf() * noiseLevel,ofRandomuf() * noiseLevel));
-    }
+      for(int m=0; m<model.getNumMeshes(); m++)
+      {
+        if(model.hasAnimations())
+        {
+          mesh = model.getCurrentAnimatedMesh(m);
+        }
+        else
+        {
+          mesh = model.getMesh(m);
+        }
+        for(int i=0; i<mesh.getNumVertices(); i++){
+            mesh.setVertex(i, mesh.getVertex(i) + ofVec3f(ofRandomuf() * noiseLevel,ofRandomuf() * noiseLevel,ofRandomuf() * noiseLevel));
+        }
 
-    if(pointMode)
-    {
-      mesh.drawVertices();
-    }
-    else
-    {
-      mesh.drawWireframe();
-    }
-  }
+        if(pointMode)
+        {
+          mesh.drawVertices();
+        }
+        else
+        {
+          mesh.drawWireframe();
+        }
+      }
 
-  ofPopMatrix();
+    ofPopMatrix();
+  ofDisableDepthTest();
 }

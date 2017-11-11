@@ -13,9 +13,12 @@ class PointModel {
     void setScale(ofVec3f scaleMultipliers);
     void setScale(float x, float y, float z);
     void setPosition(ofVec3f point);
+    void setPosition(float x, float y, float z);
     void setPointMode(bool value);
     ofVec3f getPosition();
     void setRotation(ofVec3f euler);
+    void setRotation(float x, float y, float z);
+    void update();
     void draw();
 
   private:

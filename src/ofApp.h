@@ -168,6 +168,7 @@ class ofApp : public ofBaseApp, public ofxMidiListener{
 		//Sentences
 		struct Sentence
 		{
+			string targetSentence;
 			string sentence;
 			ofVec3f position;
 			float alpha;

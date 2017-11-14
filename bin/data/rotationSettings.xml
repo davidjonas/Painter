@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <Rotation>
-	<Center_of_rotation>0, -239.796, -1800</Center_of_rotation>
+	<Center_of_rotation>0, -290.816, -1800</Center_of_rotation>
 	<Radius>12326.5</Radius>
 	<Orbit_speed>0, 0</Orbit_speed>
 	<Cam_Zero_Point>-12326.5, -239.796, -1800</Cam_Zero_Point>
 	<Reset_speed>0.0189764</Reset_speed>
 	<Far_Clip>6150</Far_Clip>
-	<Global_rotation_angle>4.95</Global_rotation_angle>
+	<Global_rotation_angle>3</Global_rotation_angle>
 	<Global_rotation_axis>1, 0, 0</Global_rotation_axis>
 </Rotation>

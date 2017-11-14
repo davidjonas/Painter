@@ -181,16 +181,19 @@ void ofApp::saveShots(string filePrefix){
 
 void ofApp::applyShot(int index){
   orbitCenterPoint = shots[index].target;
-  orbitRadius = ofDist(cam.getGlobalPosition().x, cam.getGlobalPosition().y, cam.getGlobalPosition().z, orbitCenterPoint->x, orbitCenterPoint->y, orbitCenterPoint->z);
+  orbitRadius = ofDist(shots[index].cameraPosition.x, shots[index].cameraPosition.y, shots[index].cameraPosition.z, orbitCenterPoint->x, orbitCenterPoint->y, orbitCenterPoint->z);
 
-  cam.setGlobalPosition(shots[index].cameraPosition.x, shots[index].cameraPosition.y, shots[index].cameraPosition.z);
-  cam.lookAt(shots[index].target, cam.getUpDir());
+  if(!camOrbit)
+  {
+    cam.setGlobalPosition(shots[index].cameraPosition.x, shots[index].cameraPosition.y, shots[index].cameraPosition.z);
+    cam.lookAt(shots[index].target, cam.getUpDir());
+  }
 }
 
 void ofApp::setShot(int index){
   shots[index].cameraPosition = cam.getGlobalPosition();
   shots[index].target = cam.getLookAtDir();
-  shots[index].target = cam.getGlobalPosition() + (shots[index].target.getNormalized() * ofMap(focus, 988.0, 1000.0, 10, 5000));
+  shots[index].target = cam.getGlobalPosition() + (shots[index].target.getNormalized() * ofMap(focus, 988.0, 1000.0, 10, 20000));
 }
 
 void ofApp::setupModel(){
@@ -494,6 +497,7 @@ void ofApp::onSentenceEvent (ofxSocketIOData& data) {
   {
     Sentence s;
     s.sentence = txt;
+    s.targetSentence = txt;
     s.position = ofVec3f(ofRandom(textCenter.z-textBoxDepth, textCenter.z+textBoxDepth), ofRandom(textCenter.y-textBoxHeight/2, textCenter.y+textBoxHeight/2), ofRandom(textCenter.x-textBoxWidth/2, textCenter.x+textBoxWidth/2));
     //s.position = ofVec3f(-800, -((int)sentences.size() * 150) + 400, -1500);
     //s.position = ofVec3f(0, 0, -1500);
@@ -503,7 +507,7 @@ void ofApp::onSentenceEvent (ofxSocketIOData& data) {
   }
   else
   {
-    sentences[id].sentence = txt;
+    sentences[id].targetSentence = txt;
   }
 }
 
@@ -642,7 +646,7 @@ void ofApp::draw(){
     }
 
     ofVec3f t = cam.getLookAtDir();
-    float f = ofMap(focus, 988.0, 1000.0, 10, 5000 );
+    float f = ofMap(focus, 988.0, 1000.0, 10, 20000 );
     t = cam.getGlobalPosition() + (t.getNormalized() * f);
 
     if(directorMode)
@@ -723,6 +727,33 @@ void ofApp::drawSentences()
   {
     if(sentences[i].active)
     {
+      if(sentences[i].sentence != sentences[i].targetSentence)
+      {
+        if(sentences[i].sentence.length() < sentences[i].targetSentence.length())
+        {
+          for(unsigned e=0; e<sentences[i].targetSentence.length()-sentences[i].sentence.length(); e++)
+          {
+            sentences[i].sentence = sentences[i].sentence + " ";
+          }
+        }
+
+        for(unsigned c=0; c<sentences[i].sentence.length(); c++)
+        {
+          if(c < sentences[i].targetSentence.length())
+          {
+            if(sentences[i].sentence[c] != sentences[i].targetSentence[c])
+            {
+              sentences[i].sentence[c] = sentences[i].targetSentence[c];
+              break;
+            }
+          }
+          else
+          {
+            sentences[i].sentence[c] = ' ';
+          }
+        }
+      }
+
       ofPushMatrix();
       ofSetColor(255,255,255,sentences[i].alpha);
       ofTranslate(sentences[i].position);

@@ -3,8 +3,8 @@
 	<Contrast>2</Contrast>
 	<Brightness>0</Brightness>
 	<Multiple>1</Multiple>
-	<Bright_Boost>40.1575</Bright_Boost>
+	<Bright_Boost>50</Bright_Boost>
 	<pointSize>5</pointSize>
-	<Point_Size>2</Point_Size>
-	<Sparcity>1</Sparcity>
+	<Point_Size>5</Point_Size>
+	<Sparcity>2</Sparcity>
 </Adjustment>
